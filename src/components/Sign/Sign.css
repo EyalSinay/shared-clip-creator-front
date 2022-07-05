@@ -4,24 +4,11 @@
     align-items: center;
 }
 
-@media (max-width:800px){
-    .sign-form-container{
-        flex-direction: column;
-    } 
-}
-
 .form-field-container{
     margin: 20px;
     display: grid;
     grid-template-columns: 1fr 2fr;
     justify-content: space-between;
-}
-
-@media (max-width:580px){
-    .form-field-container{
-        display: flex;
-        flex-direction: column;
-    } 
 }
 
 .remember-me-container{
@@ -53,6 +40,7 @@
 }
 
 .sign-button{
+    margin-top: 16px;
     width: 100px;
     height: 100px;
     background-image: url('../../assets/buttons-icons/play-icon\ 1.png');
@@ -65,9 +53,43 @@
 
 .sign-button:hover{
     cursor: pointer;
-    background-color: rgba(172, 255, 47, 0.5);
+    background-color: #0000ee28;
 }
 
 .other-sign-type{
-    margin-top: 40px;
+    margin-top: 48px;
+}
+
+.sign-button-container{
+    position: relative;
+}
+
+.notes{
+    position: absolute;
+    font-size: 20px;
+    color: red;
+    
+}
+
+@media (max-width:800px){
+    .sign-form-container{
+        flex-direction: column;
+    }
+    .sign-button-container{
+        width: 300px;
+    }
+    .notes{
+        top: 0px;
+        left: 120px;
+    }
+    .other-sign-type{
+        margin-top: 16px;
+    }
+}
+
+@media (max-width:580px){
+    .form-field-container{
+        display: flex;
+        flex-direction: column;
+    }
 }
