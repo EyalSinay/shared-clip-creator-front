@@ -31,17 +31,21 @@ function SignInForm() {
       setNotes(noteMessage);
       return;
     }
-    
+
     const params = {
       email,
       password,
       rememberMe
     }
     try {
-      const results = await axios.post(BASE_URL + "/users/signin", { params });
-      console.log("results:", results);
+      const results = await axios.post(BASE_URL + "/users/signin", params);
+      console.log("results:", results.data);
+      if (rememberMe && results.data.hasOwnProperty('token')) {
+        localStorage.setItem('TOKEN', results.data.token);
+      }
+      //! navigate...
     } catch (err) {
-      console.error("error:", err.message);
+      console.error("error:", err);
       setNotes("Sign in failed.");
     }
   }
@@ -60,7 +64,7 @@ function SignInForm() {
         <section>
           <span>Forget your password? </span>
           <Link to="/sign-in">click hear</Link>
-          <span> to send your password to your mail</span>
+          <span> to send you a new password to your mail</span>
         </section>
         <section>
           <span>Do you already have an account? </span>

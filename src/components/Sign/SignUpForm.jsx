@@ -43,8 +43,12 @@ function SignUpForm() {
       rememberMe
     }
     try {
-      const results = await axios.post(BASE_URL + "/users/signup", { params });
-      console.log("results:", results);
+      const results = await axios.post(BASE_URL + "/users/signup", params);
+      console.log("results:", results.data);
+      if (rememberMe && results.data.hasOwnProperty('token')) {
+        localStorage.setItem('TOKEN', results.data.token);
+      }
+      //! navigate...
     } catch (err) {
       console.error("error:", err);
       setNotes("Something wrong.");
