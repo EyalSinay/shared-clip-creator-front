@@ -5,6 +5,8 @@ body {
   font-family: 'Grechen Fuemen', 'Cabin', 'Josefin Sans', cursive, sans-serif;
 
   background-image: url('./assets/background-intersection.webp');
+
+  font-size: 28px;
 }
 
 /* body {

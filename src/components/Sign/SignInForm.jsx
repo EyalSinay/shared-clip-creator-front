@@ -4,24 +4,23 @@ import FormField from './FormField';
 import RememberMe from './RememberMe';
 import SignButton from './SignButton';
 
-function SignUpForm() {
+function SignInForm() {
   return (
-    <div className="sign-up">
+    <div className="sign-in">
       <form className='sign-form-container'>
         <div className="fields-container">
           <FormField type={"email"} field={"Email"} />
           <FormField type={"password"} field={"Password"} />
-          <FormField type={"text"} field={"Name"} />
           <RememberMe />
         </div>
         <SignButton />
       </form>
       <div className="other-sign-type center-text">
         <span>Do you already have an account? </span>
-        <Link to="/sign-in">Sign In</Link>
+        <Link to="/sign-up">Sign Up</Link>
       </div>
     </div>
   )
 }
 
-export default SignUpForm
+export default SignInForm

@@ -4,14 +4,41 @@
     align-items: center;
 }
 
+@media (max-width:800px){
+    .sign-form-container{
+        flex-direction: column;
+    } 
+}
+
 .form-field-container{
     margin: 20px;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
     justify-content: space-between;
+}
+
+@media (max-width:580px){
+    .form-field-container{
+        display: flex;
+        flex-direction: column;
+    } 
+}
+
+.remember-me-container{
+    margin: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.remember-me-check-box{
+    margin-right: 16px;
+    height: 28px;
+    width: 28px;
 }
 
 .sign-form{
     font-size: 38px;
+    width: 100%;
 }
 
 /* .sign-form-label {
@@ -21,6 +48,8 @@
 .sign-form-input {
     border-radius: 14px;
     margin-left: 8px;
+    width: 95%;
+    font-size: 24px;
 }
 
 .sign-button{
@@ -37,4 +66,8 @@
 .sign-button:hover{
     cursor: pointer;
     background-color: rgba(172, 255, 47, 0.5);
+}
+
+.other-sign-type{
+    margin-top: 40px;
 }
