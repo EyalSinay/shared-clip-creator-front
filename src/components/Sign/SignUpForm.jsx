@@ -52,7 +52,7 @@ function SignUpForm() {
       if (rememberMe && results.data.hasOwnProperty('token')) {
         localStorage.setItem('TOKEN', results.data.token);
       }
-      navigate('/my-projects');
+      navigate('/');
     } catch (err) {
       setNotes("Something wrong.");
     }

@@ -17,9 +17,9 @@ function Welcome() {
               <h2>Shared Clip Creator</h2>
               <h3>Create a collaboration clip in 3 steps</h3>
               <ol>
-                <li>Upload an audio file</li>
-                <li>Divide into sections for your participants</li>
-                <li>Send everyone links to their sections</li>
+                <a href="#welcome-sec2"><li>Upload an audio file</li></a>
+                <a href="#welcome-sec3"><li>Divide into sections for your participants</li></a>
+                <a href="#welcome-sec4"><li>Send everyone links to their sections</li></a>
               </ol>
               <section>Your participants will receive a simple page where they will be asked to record themselves in a video on top of the sound clip you sent them, or upload a video or photo.</section>
               <section>Once everyone is done you can have the clip edited and ready!</section>
@@ -31,9 +31,9 @@ function Welcome() {
         <a href="#welcome-sec2"><div className='down-arrow arrow'></div></a>
         </div>
       </div>
-        <ExplainSection image={"IMAGE"} textArr={["text-", "text"]} numOfSec={2} />
-        <ExplainSection image={"IMAGE"} textArr={["text-", "text"]} numOfSec={3} />
-        <ExplainSection image={"IMAGE"} textArr={["text-", "text"]} numOfSec={4} />
+        <ExplainSection image={"IMAGE"} textArr={["step-1_", "text"]} numOfSec={2} />
+        <ExplainSection image={"IMAGE"} textArr={["step-2_", "text"]} numOfSec={3} />
+        <ExplainSection image={"IMAGE"} textArr={["step-3_", "text"]} numOfSec={4} />
     </div>
   )
 }
