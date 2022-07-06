@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import FormField from './FormField';
 import RememberMe from './RememberMe';
 import SignButton from './SignButton';
 import { BASE_URL } from '../../utils/globalConst.js'
+import { UserContext } from '../../providers/UserProvider';
 
 function SignUpForm() {
+  const {setUser} = useContext(UserContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -22,6 +24,7 @@ function SignUpForm() {
 
   const onSignButtonClick = async (e) => {
     e.preventDefault();
+    setNotes("Loading...");
     let noteMessage = ""
     if (email === "") {
       noteMessage += "email is required.\n";
@@ -46,6 +49,7 @@ function SignUpForm() {
     try {
       const results = await axios.post(BASE_URL + "/users/signup", params);
       console.log("results:", results.data);
+      setUser(results.data);
       if (rememberMe && results.data.hasOwnProperty('token')) {
         localStorage.setItem('TOKEN', results.data.token);
       }

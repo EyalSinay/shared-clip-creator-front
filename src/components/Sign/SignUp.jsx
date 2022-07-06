@@ -1,8 +1,19 @@
-import React from 'react'
+import './Sign.css';
+import React, { useContext } from 'react';
 import SignUpForm from './SignUpForm';
+import SignOutFirst from './SignOutFirst';
+import Spinner from '../global-components/Spinner';
+import { UserContext } from '../../providers/UserProvider';
 
-// !if token, ask sign out first
 function SignUp() {
+  const {user, loadingUser} = useContext(UserContext);
+
+
+  if (loadingUser) {
+    return <Spinner />
+  }
+
+
   return (
     <div className="container sign-up">
       <header>
@@ -19,7 +30,7 @@ function SignUp() {
           </section>
         </h2>
       </header>
-      <SignUpForm />
+      {Object.keys(user).length === 0 ? <SignUpForm /> : <SignOutFirst user={user} />}
     </div>
   );
 }

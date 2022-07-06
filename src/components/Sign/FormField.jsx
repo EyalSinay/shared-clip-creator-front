@@ -1,4 +1,3 @@
-import './Sign.css'
 import React from 'react';
 
 
