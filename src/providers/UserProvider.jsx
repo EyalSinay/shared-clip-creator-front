@@ -27,7 +27,6 @@ function UserProvider({ children }) {
         }
     }, [user]);
 
-    console.log(user);
     return (
         <UserContext.Provider value={{ user, setUser, loadingUser, errorUser }}>
             {children}
