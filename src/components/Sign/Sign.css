@@ -1,29 +1,32 @@
-.sign-form-container{
+.sign-form-container {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items: flex-start;
+    width: 90%;
+    margin: auto;
 }
 
-.form-field-container{
+.form-field-container {
     margin: 20px;
     display: grid;
     grid-template-columns: 1fr 2fr;
     justify-content: space-between;
 }
 
-.remember-me-container{
+.remember-me-container {
     margin: 20px;
+    padding-left: 60px;
     display: flex;
     justify-content: center;
 }
 
-.remember-me-check-box{
+.remember-me-check-box {
     margin-right: 16px;
     height: 28px;
     width: 28px;
 }
 
-.sign-form{
+.sign-form {
     font-size: 38px;
     width: 100%;
 }
@@ -39,7 +42,7 @@
     font-size: 24px;
 }
 
-.sign-button{
+.sign-button {
     margin-top: 16px;
     width: 100px;
     height: 100px;
@@ -51,47 +54,42 @@
     transition: background-color 1s;
 }
 
-.sign-button:hover{
+.sign-button:hover {
     cursor: pointer;
     background-color: #0000ee28;
 }
 
-.other-sign-type{
+.other-sign-type {
     margin-top: 110px;
     margin-bottom: 20px;
 }
 
-.sign-button-container{
-    position: relative;
-}
-
-.notes{
-    position: absolute;
+.notes {
+    margin: 20px;
     font-size: 20px;
     color: red;
-    
+    text-align: center;
 }
 
-@media (max-width:800px){
-    .sign-form-container{
+@media (max-width:800px) {
+    .sign-form-container {
         flex-direction: column;
         align-items: center;
     }
-    .sign-button-container{
-        width: 300px;
-    }
-    .notes{
-        top: 0px;
-        left: 120px;
-    }
-    .other-sign-type{
+
+    .other-sign-type {
         margin-top: 16px;
     }
 }
 
-@media (max-width:580px){
-    .form-field-container{
+@media (max-width:580px) {
+    .form-field-container {
         display: flex;
         flex-direction: column;
+    }
+
+    .remember-me-container {
+        justify-content: start;
+        padding: 0;
     }
 }

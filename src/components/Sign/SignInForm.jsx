@@ -8,7 +8,7 @@ import { BASE_URL } from '../../utils/globalConst.js'
 import { UserContext } from '../../providers/UserProvider';
 
 function SignInForm() {
-  const {setUser} = useContext(UserContext)
+  const { setUser } = useContext(UserContext)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
@@ -60,8 +60,9 @@ function SignInForm() {
           <FormField type={"password"} field={"Password"} onFieldChange={onPasswordChange} valField={password} />
           <RememberMe onCheckboxChange={onRememberMeChange} valRememberMe={rememberMe} />
         </div>
-        <SignButton notes={notes} />
+        <SignButton />
       </form>
+      <section className='notes'>{notes}</section>
       <div className="other-sign-type center-text">
         <section>
           <span>Forget your password? </span>

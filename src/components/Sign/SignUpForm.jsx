@@ -8,7 +8,7 @@ import { BASE_URL } from '../../utils/globalConst.js'
 import { UserContext } from '../../providers/UserProvider';
 
 function SignUpForm() {
-  const {setUser} = useContext(UserContext);
+  const { setUser } = useContext(UserContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -69,8 +69,9 @@ function SignUpForm() {
           <FormField onFieldChange={onNameChange} type={"text"} field={"Name"} valField={name} />
           <RememberMe onCheckboxChange={onRememberMeChange} valRememberMe={rememberMe} />
         </div>
-        <SignButton notes={notes} />
+        <SignButton />
       </form>
+      <section className='notes'>{notes}</section>
       <div className="other-sign-type center-text">
         <span>Do you already have an account? </span>
         <Link to="/sign-in">Sign In</Link>
