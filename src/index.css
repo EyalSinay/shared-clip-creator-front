@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Cabin:ital,wght@1,500&family=Grechen+Fuemen&family=Josefin+Sans&display=swap');
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   font-family: 'Grechen Fuemen', 'Cabin', 'Josefin Sans', cursive, sans-serif;
