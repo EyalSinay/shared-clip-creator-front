@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import FormField from './FormField';
 import RememberMe from './RememberMe';
@@ -13,6 +13,7 @@ function SignInForm() {
   const [rememberMe, setRememberMe] = useState(true);
 
   const [notes, setNotes] = useState("");
+  const navigate = useNavigate();
 
   const onEmailChange = (e) => setEmail(e.target.value);
   const onPasswordChange = (e) => setPassword(e.target.value);
@@ -43,7 +44,7 @@ function SignInForm() {
       if (rememberMe && results.data.hasOwnProperty('token')) {
         localStorage.setItem('TOKEN', results.data.token);
       }
-      //! navigate...
+      navigate('/my-projects');
     } catch (err) {
       console.error("error:", err);
       setNotes("Sign in failed.");

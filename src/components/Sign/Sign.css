@@ -1,7 +1,7 @@
 .sign-form-container{
     display: flex;
     justify-content: space-evenly;
-    align-items: center;
+    align-items: flex-start;
 }
 
 .form-field-container{
@@ -57,7 +57,8 @@
 }
 
 .other-sign-type{
-    margin-top: 48px;
+    margin-top: 110px;
+    margin-bottom: 20px;
 }
 
 .sign-button-container{
@@ -74,6 +75,7 @@
 @media (max-width:800px){
     .sign-form-container{
         flex-direction: column;
+        align-items: center;
     }
     .sign-button-container{
         width: 300px;
