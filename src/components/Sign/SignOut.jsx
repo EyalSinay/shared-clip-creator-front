@@ -19,7 +19,7 @@ function SignOut() {
   }
 
   return (
-    <button onClick={onSignOutClick}>sign out from this device</button>
+    <button className='simple-btn' onClick={onSignOutClick}>sign out from this device</button>
   )
 }
 

@@ -19,7 +19,7 @@ function SignOutAll() {
   }
 
   return (
-    <button onClick={onSignOutAllClick}>Sign out from all devices</button>
+    <button className='simple-btn' onClick={onSignOutAllClick}>Sign out from all devices</button>
   )
 }
 

@@ -1,20 +1,18 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom';
 import SignOut from '../Sign/SignOut';
 import SignOutAll from '../Sign/SignOutAll';
+import CreateNew from './CreateNew';
+import ProjectsNavigates from './ProjectsNavigate';
 
 function UserConnect({ user }) {
-    const navigate = useNavigate();
-    console.log(user);
-
     return (
         <>
             <h2>{`Hello ${user.name}!`}</h2>
-            <section className='projects-list options'>
-                {user.projects.map(project => <button key={project._id} onClick={() => navigate('/project/' + project._id)}>{project.projectName}</button>)}
-            </section>
+            {user.projects && <section className='projects-list options'>
+                <ProjectsNavigates projects={user.projects} />
+            </section>}
             <section className='create-new-project options'>
-                <button>Create a new project</button>
+                <CreateNew />
             </section>
             <section className='sign-out-options options'>
                 <div>
