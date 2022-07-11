@@ -8,18 +8,24 @@ import * as WaveformTimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.ti
 import * as WaveformCursorPlugin from "wavesurfer.js/dist/plugin/wavesurfer.cursor";
 import getProjectById from '../../utils/getProjectById.js';
 import randomColor from "randomcolor";
+import { Beforeunload } from 'react-beforeunload';
+import Spinner3Absolute from '../global-components/Spinner3Absolute';
 
 function Project() {
   const [wavesurferObj, setWavesurferObj] = useState();
   const waveform = useRef(null);
   const waveformTimeline = useRef(null);
 
+  const [loadingAudio, setLoadingAudio] = useState(true)
+
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(1);
+  const [zoom, setZoom] = useState(1);
   const [duration, setDuration] = useState(0);
+
   const [markers, setMarkers] = useState([]);
-  const [newMarkerSec, setNewMarkerSec] = useState("");
-  const [newMarkerName, setNewLabelName] = useState("");
+  const [newMarkerSecond, setNewMarkerSecond] = useState(0);
+  const [newMarkerName, setNewMarkerName] = useState("sec1");
 
   const [project, setProject] = useState({});
   const paramsPath = useParams();
@@ -58,13 +64,14 @@ function Project() {
           waveColor: "#567FFF",
           progressColor: '#69207F',
           loopSelection: true,
+          // hideScrollbar: true,
+          height: 200,
           barGap: 2,
           barWidth: 3,
           barRadius: 3,
           cursorWidth: 3,
           cursorColor: "#567FFF",
           responsive: true,
-          // backend: 'MediaElement',
           plugins: [
             WaveformMarkersPlugin.create(),
             WaveformTimelinePlugin.create({ container: "#waveform-timeline" }),
@@ -79,14 +86,14 @@ function Project() {
     if (wavesurferObj) {
       const projectId = paramsPath.id;
       wavesurferObj.load("http://127.0.0.1:5050/users/projects/" + projectId + "/audioTrack");
-      // wavesurferObj.load("https://s3-us-west-2.amazonaws.com/s.cdpn.io/123941/Yodel_Sound_Effect.mp3");
     }
   }, [paramsPath.id, wavesurferObj]);
 
   useEffect(() => {
     if (wavesurferObj) {
       wavesurferObj.on('ready', () => {
-        setDuration(Math.floor(wavesurferObj.getDuration())); // set the duration in local state
+        setDuration(Math.floor(wavesurferObj.getDuration()));
+        setLoadingAudio(false)
       });
 
       wavesurferObj.on('play', () => {
@@ -94,15 +101,21 @@ function Project() {
       });
 
       wavesurferObj.on('finish', () => {
-        setPlaying(true);
+        setPlaying(false);
       });
 
+      if (markers.length === 0) createNewMarker();
     }
+    // eslint-disable-next-line
   }, [wavesurferObj]);
 
   useEffect(() => {
     if (wavesurferObj) wavesurferObj.setVolume(volume);
   }, [volume, wavesurferObj]);
+
+  useEffect(() => {
+    if (wavesurferObj) wavesurferObj.zoom(zoom);
+  }, [zoom, wavesurferObj]);
 
   const handlePlayPause = () => {
     wavesurferObj.playPause();
@@ -113,63 +126,91 @@ function Project() {
     setVolume(e.target.value);
   };
 
+  const handleZoomSlider = (e) => {
+    setZoom(e.target.value);
+  };
+
   const createNewMarker = () => {
     const color = randomColor({
-      luminosity: "light",
-      alpha: 0.3,
+      luminosity: "dark",
+      alpha: 0.5,
       format: "rgba",
     });
 
-    const newLabel = {
-      time: parseInt(newMarkerSec),
+    const newMarker = {
+      time: newMarkerSecond,
       label: newMarkerName,
       color,
     }
 
-    setMarkers(() => {
-      const newArr = [...markers];
-      newArr.push(newLabel)
-      return newArr;
+    const sectionsArr = [...markers, newMarker]
+    sectionsArr.sort((secA, secB) => secA.time - secB.time);
+
+    wavesurferObj.clearMarkers();
+    sectionsArr.forEach((sec, index) => {
+      const pos = index % 2 === 0 ? "bottom" : "top";
+      wavesurferObj.addMarker({ ...sec, position: pos });
     });
 
-    wavesurferObj.addMarker(newLabel);
+    setMarkers(sectionsArr);
   }
 
   console.log(markers);
-  console.log(duration);
 
   return (
     <div className='project-container'>
-      <div className='titles'>
+      <Beforeunload onBeforeunload={(e) => e.preventDefault()} />
+      <section className='titles'>
         <h1 className='center-text'>Project Name</h1>
         <h6 className='center-text'>edit mode</h6>
-      </div>
-      <div className="waveform-container">
-        <div ref={waveform} id="waveform" />
-        <div ref={waveformTimeline} id="waveform-timeline" />
-      </div>
-      <button onClick={createNewMarker}>create</button>
-      <button onClick={handlePlayPause}>{playing ? "PAUSE" : "PLAY"}</button>
-      <label htmlFor="new-label-sec">second:</label>
-      <input type="number" name="new-label-sec" id="new-label-sec" onChange={e => setNewMarkerSec(e.target.value)} />
-      <label htmlFor="new-label-name">name:</label>
-      <input type="text" name="new-label-name" id="new-label-name" onChange={e => setNewLabelName(e.target.value)} />
-      <input
-        type='range'
-        min='0'
-        max='1'
-        step='0.05'
-        value={volume}
-        onChange={handleVolumeSlider}
-        className='slider volume-slider'
-      />
-      {/* {markers.map(sec => {
-        return (
-          <div key={1}>
-            <button onClick={createNewMarker}>{1}</button>
+      </section>
+      <section>
+        <div className="waveform-container" >
+          {loadingAudio && <Spinner3Absolute />}
+          <div ref={waveform} id="waveform" />
+          <div ref={waveformTimeline} id="waveform-timeline" />
+        </div>
+        <div className="waveform-container controllers-container">
+          <button onClick={handlePlayPause}>{playing ? "PAUSE" : "PLAY"}</button>
+          <input
+            type='range'
+            min='0'
+            max='1'
+            step='0.05'
+            value={volume}
+            onChange={handleVolumeSlider}
+            className='slider volume-slider'
+          />
+          <input
+            type='range'
+            min='1'
+            max='1000'
+            value={zoom}
+            onChange={handleZoomSlider}
+            className='slider zoom-slider'
+          />
+        </div>
+      </section>
+      <section>
+        <div className="section-container">
+          {markers.map(sec => `${sec.label} `)}
+        </div>
+        <div className="section-input-container">
+          <button onClick={createNewMarker}>create</button>
+          <div className='new-label-name-container'>
+            <label htmlFor="new-label-name">participant: </label>
+            <input type="text" name="new-label-name" id="new-label-name" onChange={e => setNewMarkerName(e.target.value)} />
           </div>
-        )
-      })} */}
+          <div className='new-label-sec-container'>
+            <label htmlFor="new-label-sec">second: </label>
+            <input type="number" name="new-label-sec" id="new-label-sec" max={duration - 5} onChange={e => setNewMarkerSecond(parseInt(
+              e.target.value))} />
+          </div>
+        </div>
+      </section>
+      <section className="message-container">
+        <input type="textarea" id='message-input' />
+      </section>
     </div>
   )
 }
