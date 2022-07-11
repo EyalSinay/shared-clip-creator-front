@@ -18,3 +18,10 @@ h2{
 #welcome-link{
     position: fixed;
 }
+
+.hover-opacity{
+    transition: 1s;
+}
+.hover-opacity:hover{
+    opacity: 0.5;
+}

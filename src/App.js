@@ -6,11 +6,12 @@ import SignIn from './components/Sign/SignIn';
 import Project from './components/Project/Project';
 import Section from './components/Section/Section';
 import ErrorPage from './components/ErrorPage/ErrorPage';
+import logoImg from './assets/logo.png';
 
 function App() {
   return (
     <BrowserRouter>
-      <Link id='welcome-link' to="/">LOGO</Link>
+      <Link className='hover-opacity' id='welcome-link' to="/"><img src={logoImg} alt="CollaClip" style={{width: "100px", margin: "20px"}} /></Link>
       <Routes>
         <Route path='/' element={<Welcome />} />
         <Route path='/sign-up' element={<SignUp />} />

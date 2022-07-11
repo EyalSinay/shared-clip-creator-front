@@ -8,7 +8,7 @@ import { BASE_URL } from '../../utils/globalConst.js'
 import { UserContext } from '../../providers/UserProvider';
 
 function SignUpForm() {
-  const { setUser } = useContext(UserContext);
+  const { setUser, setToken } = useContext(UserContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -43,13 +43,13 @@ function SignUpForm() {
     const params = {
       name,
       email,
-      password,
-      rememberMe
+      password
     }
     try {
       const results = await axios.post(BASE_URL + "/users/signup", params);
       setUser(results.data.user);
-      if (rememberMe && results.data.hasOwnProperty('token')) {
+      setToken(results.data.token);
+      if (rememberMe) {
         localStorage.setItem('TOKEN', results.data.token);
       }
       navigate('/');

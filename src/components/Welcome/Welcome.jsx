@@ -6,7 +6,7 @@ import UserDisConnect from './UserDisConnect';
 import ExplainSection from './ExplainSection';
 
 function Welcome() {
-  const { user } = useContext(UserContext);
+  const { user, projects } = useContext(UserContext);
 
   return (
     <div className='very-first-welcome-container'>
@@ -25,7 +25,7 @@ function Welcome() {
               <section>Once everyone is done you can have the clip edited and ready!</section>
             </div>
             <div className='main-welcome-sec__side2 side'>
-              {Object.keys(user).length === 0 ? <UserDisConnect /> : <UserConnect user={user} />}
+              {Object.keys(user).length === 0 ? <UserDisConnect /> : <UserConnect user={user} projects={projects} />}
             </div>
           </section>
         <a href="#welcome-sec2"><div className='down-arrow arrow'></div></a>

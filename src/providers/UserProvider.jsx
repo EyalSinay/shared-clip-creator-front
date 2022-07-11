@@ -5,6 +5,8 @@ export const UserContext = createContext({});
 
 function UserProvider({ children }) {
     const [user, setUser] = useState({});
+    const [projects, setProjects] = useState([]);
+    const [token, setToken] = useState("");
     const [loadingUser, setLoadingUser] = useState(false);
     const [errorUser, setErrorUser] = useState({});
 
@@ -15,8 +17,9 @@ function UserProvider({ children }) {
                 const auth = async () => {
                     setLoadingUser(true);
                     try {
-                        const theUser = await getUser(token);
-                        setUser(theUser);
+                        const data = await getUser(token);
+                        setUser(data.user);
+                        setProjects(data.projects);
                     } catch (err) {
                         setErrorUser(err);
                     }
@@ -27,8 +30,9 @@ function UserProvider({ children }) {
         }
     }, [user]);
 
+    
     return (
-        <UserContext.Provider value={{ user, setUser, loadingUser, errorUser }}>
+        <UserContext.Provider value={{ user, setUser, loadingUser, errorUser, token, setToken, projects, setProjects }}>
             {children}
         </UserContext.Provider>
     )
