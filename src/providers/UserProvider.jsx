@@ -10,8 +10,6 @@ function UserProvider({ children }) {
     const [loadingUser, setLoadingUser] = useState(false);
     const [errorUser, setErrorUser] = useState({});
 
-    console.log(projects);
-
     useEffect(() => {
         if (Object.keys(user).length === 0) {
             const token = localStorage.getItem("TOKEN");
