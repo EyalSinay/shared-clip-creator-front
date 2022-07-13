@@ -6,6 +6,7 @@ const updateSections = async (token, projectId, sectionsArr) => {
     sectionsArr.forEach(sec => {
         bodyArr.push({
             secName: sec.name,
+            projectName: sec.projectName,
             color: sec.color,
             targetEmail: sec.targetEmail,
             targetPhon: sec.targetPhon,
@@ -15,6 +16,7 @@ const updateSections = async (token, projectId, sectionsArr) => {
             secondEnd: sec.secondEnd,
             seenByOwner: sec.seenByOwner,
             vars: sec.vars,
+            massage: sec.massage,
         });
     });
 

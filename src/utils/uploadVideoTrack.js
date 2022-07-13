@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { BASE_URL } from './globalConst.js';
 
-const uploadAudioTrack = async (token, projectId, fd) => {
+const uploadVideoTrack = async (token, projectId, sectionId, fd) => {
     const config = {
         headers: {
-            'content-type': 'audio/mpeg',
+            'content-type': 'video/mp4',
             Authorization: `Bearer ${token}`
         },
         onUploadProgress: function (progressEvent) {
@@ -13,11 +13,11 @@ const uploadAudioTrack = async (token, projectId, fd) => {
         }
     };
     try {
-        const results = await axios.post(BASE_URL + "/users/projects/" + projectId + "/audioTrack", fd, config);
+        const results = await axios.patch(BASE_URL + "/users/projects/" + projectId + "/sections/" + sectionId + "/videoTrack", fd, config);
         return results;
     } catch (err) {
         console.error(err);
     }
 }
 
-export default uploadAudioTrack;
+export default uploadVideoTrack;

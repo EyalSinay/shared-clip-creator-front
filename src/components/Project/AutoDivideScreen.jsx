@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react'
 import randomColor from "randomcolor";
 
 
-function AutoDivideScreen({ duration, create, cancel }) {
+function AutoDivideScreen({ project, duration, create, cancel }) {
     const [participantNum, setParticipantNum] = useState(2);
     const inputRef = useRef(null)
 
@@ -15,9 +15,21 @@ function AutoDivideScreen({ duration, create, cancel }) {
                     alpha: 0.5,
                     format: "rgba",
                 });
+
                 const newMarker = {
                     secondStart: Math.round((duration / participantNum) * i * 10) / 10,
                     name: "sec" + (i + 1),
+                    projectName: project.projectName,
+                    targetEmail: "",
+                    targetPhon: "",
+                    secure: false,
+                    allowedWatch: false,
+                    secLink: "",
+                    fullLink: "",
+                    seenByOwner: true,
+                    seenByParticipant: false,
+                    vars: [],
+                    massage: "",
                     color,
                     editMode: false,
                     id: Date.now() + i

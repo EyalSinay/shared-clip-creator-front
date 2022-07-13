@@ -51,9 +51,9 @@ function Project() {
     if (Object.keys(project).length === 0) {
       if (location?.state?.projectData) {
         setProject(location.state.projectData);
-      } else if (Object.keys(projects).length === 0) {
+      } else if (Object.keys(projects).length === 0 && projects.length > 0) {
         const projectId = paramsPath.id;
-        const theProject = projects.find(project => project.id === projectId);
+        const theProject = projects.find(project => project._id === projectId);
         setProject(theProject);
       } else {
         const projectId = paramsPath.id;
@@ -133,6 +133,7 @@ function Project() {
         project.sections.forEach(sec => {
           newArr.push({
             name: sec.secName,
+            projectName: sec.projectName,
             color: sec.color,
             editMode: false,
             id: sec._id,
@@ -146,6 +147,7 @@ function Project() {
             seenByOwner: sec.seenByOwner,
             seenByParticipant: sec.seenByParticipant,
             vars: sec.vars,
+            massage: sec.massage,
           });
         });
 
@@ -312,8 +314,9 @@ function Project() {
       const newMarker = {
         secondStart: newMarkerSecond,
         name: newMarkerName,
-        targetEmail: "", //! create useState and inputs
-        targetPhon: "", //! create useState and inputs
+        projectName: project.projectName,
+        targetEmail: "abc@def.com", //! create useState and inputs
+        targetPhon: "0543216933", //! create useState and inputs
         secure: false, //! create useState and inputs
         allowedWatch: false, //! create useState and inputs
         secLink: "", // get from server after saving and update
@@ -321,6 +324,7 @@ function Project() {
         seenByOwner: true,
         seenByParticipant: false,
         vars: [], //! create useState and inputs
+        massage: "some message", //! create useState and inputs
         color,
         editMode: false,
         id: Date.now() // get from server after saving and update
@@ -372,13 +376,11 @@ function Project() {
     setProjects(newProjects);
   }
 
+
   return (
     <div className='project-container'>
       <SpinnerAllPageOnComponent loading={loadingAudio} />
-      <Beforeunload onBeforeunload={(e) => e.preventDefault()} />
-      <MessageScreen screenShow={autoDivideMode} turnOff={() => setAutoDivideMode(false)} >
-        <AutoDivideScreen duration={duration} create={autoDivideCreate} cancel={() => setAutoDivideMode(false)} />
-      </MessageScreen>
+      <Beforeunload onBeforeunload={(e) => { if (editProjectMode) e.preventDefault() }} />
       <section className='titles'>
         <h1 className='center-text'>{project.projectName}</h1>
         <h6 className='center-text'>edit mode</h6>
@@ -431,6 +433,9 @@ function Project() {
             </div>
             <button onClick={() => setAutoDivideMode(true)} >auto divide</button>
             <button onClick={createNewMarker}>create</button>
+            <MessageScreen screenShow={autoDivideMode} turnOff={() => setAutoDivideMode(false)} >
+              <AutoDivideScreen project={project} duration={duration} create={autoDivideCreate} cancel={() => setAutoDivideMode(false)} />
+            </MessageScreen>
           </div>
         }
       </section>
@@ -452,6 +457,7 @@ function Project() {
       </section>
       <section className="message-container">
         <input type="textarea" id='message-input' />
+        {/* create a projectMessage state and update the project in db with PATCH(!) request */}
       </section>
     </div>
   )

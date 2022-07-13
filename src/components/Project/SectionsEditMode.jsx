@@ -34,6 +34,10 @@ function SectionsEditMode({
         onEditMarker(section.id, "secondStart", validValue);
     }
 
+    const onCopyLinkClick = () => {
+        navigator.clipboard.writeText(section.fullLink);
+    }
+
     return (
         <div className='section-container'>
             <div className='label-name-container'>
@@ -66,7 +70,7 @@ function SectionsEditMode({
                     {section.secondStart !== 0 && <button onClick={() => onDeleteClick(section.id)}>delete</button>}
                 </div>
                 :
-                "LINK"
+                <button onClick={onCopyLinkClick} >Copy link</button>
             }
         </div>
     )
