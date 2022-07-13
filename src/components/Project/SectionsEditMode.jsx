@@ -3,14 +3,22 @@ import { useEffect } from 'react';
 import { useRef } from 'react';
 import { useState } from 'react';
 
-function SectionsEditMode({ section, duration, onEditMarker, getValidDecrement, getValidIncrement, onDeleteClick }) {
+function SectionsEditMode({
+    section,
+    duration,
+    onEditMarker,
+    getValidDecrement,
+    getValidIncrement,
+    onDeleteClick,
+    editProjectMode
+}) {
     const [inputSecond, setInputSecond] = useState("");
     const inputSecondElement = useRef(null);
 
     useEffect(() => {
         setInputSecond(section.secondStart);
         // eslint-disable-next-line
-    },[section.editMode]);
+    }, [section.editMode]);
 
     const handleEditMarker = (editedKey, value, inputElement) => {
         onEditMarker(section.id, editedKey, value, inputElement);
@@ -51,8 +59,15 @@ function SectionsEditMode({ section, duration, onEditMarker, getValidDecrement, 
                     <span>{`${section.secondStart} - ${section.secondEnd}`}</span>
                 }
             </div>
-            {section.secondStart !== 0 && <button onClick={() => onDeleteClick(section.id)}>delete</button>}
-            <button onClick={() => handleEditMarker("editMode", !section.editMode)} >{section.editMode ? "finish" : "edit"}</button>
+            {editProjectMode
+                ?
+                <div className="edit-delete-container">
+                    <button onClick={() => handleEditMarker("editMode", !section.editMode)} >{section.editMode ? "finish" : "edit"}</button>
+                    {section.secondStart !== 0 && <button onClick={() => onDeleteClick(section.id)}>delete</button>}
+                </div>
+                :
+                "LINK"
+            }
         </div>
     )
 }

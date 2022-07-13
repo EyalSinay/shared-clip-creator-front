@@ -6,8 +6,8 @@ const getProjectById = async (token, projectId) => {
         headers: { Authorization: `Bearer ${token}` }
     };
     try {
-        const result = await axios.get(BASE_URL + "/users/projects/" + projectId, config);
-        return result;
+        const response = await axios.get(BASE_URL + "/users/projects/" + projectId, config);
+        return response.data;
     } catch (err) {
         console.error(err);
     }

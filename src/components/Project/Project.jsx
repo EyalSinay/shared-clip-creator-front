@@ -1,26 +1,33 @@
 import './Project.css';
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import { UserContext } from '../../providers/UserProvider.jsx';
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Wavesurfer from "wavesurfer.js";
 import * as WaveformMarkersPlugin from "wavesurfer.js/dist/plugin/wavesurfer.markers";
 import * as WaveformTimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline";
 import * as WaveformCursorPlugin from "wavesurfer.js/dist/plugin/wavesurfer.cursor";
 import getProjectById from '../../utils/getProjectById.js';
+import updateSections from '../../utils/updateSections.js';
+import deleteProject from '../../utils/deleteProject.js';
 import randomColor from "randomcolor";
 import { Beforeunload } from 'react-beforeunload';
 import SpinnerAllPageOnComponent from '../global-components/SpinnerAllPageOnComponent';
 import SectionsEditMode from './SectionsEditMode';
 import MessageScreen from '../global-components/MessageScreen';
-import AutoDivideScreen from './AutoDivideScreen'
+import AutoDivideScreen from './AutoDivideScreen';
 
 function Project() {
+  const navigate = useNavigate();
+
   const [wavesurferObj, setWavesurferObj] = useState();
   const waveform = useRef(null);
   const waveformTimeline = useRef(null);
 
   const [loadingAudio, setLoadingAudio] = useState(true);
   const [autoDivideMode, setAutoDivideMode] = useState(false);
+  const [editProjectMode, setEditProjectMode] = useState(true);
+  const [preEditWarning, setPreEditWarning] = useState(false);
+  const [preDeleteWarning, setPreDeleteWarning] = useState(false);
 
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(1);
@@ -36,7 +43,7 @@ function Project() {
 
   const [project, setProject] = useState({});
   const paramsPath = useParams();
-  const { token } = useContext(UserContext);
+  const { token, projects, setProjects } = useContext(UserContext);
   const location = useLocation();
 
   // projectData:
@@ -44,13 +51,17 @@ function Project() {
     if (Object.keys(project).length === 0) {
       if (location?.state?.projectData) {
         setProject(location.state.projectData);
+      } else if (Object.keys(projects).length === 0) {
+        const projectId = paramsPath.id;
+        const theProject = projects.find(project => project.id === projectId);
+        setProject(theProject);
       } else {
         const projectId = paramsPath.id;
         const theToken = token || localStorage.getItem("TOKEN");
         const fetchProjectData = async () => {
           try {
-            const results = await getProjectById(theToken, projectId);
-            setProject(results.data);
+            const data = await getProjectById(theToken, projectId);
+            setProject(data);
           } catch (err) {
             console.error(err);
           }
@@ -58,6 +69,7 @@ function Project() {
         fetchProjectData();
       }
     }
+    // eslint-disable-next-line
   }, [project, token, paramsPath.id, location]);
 
   // audio:
@@ -115,13 +127,49 @@ function Project() {
   }, [wavesurferObj]);
 
   useEffect(() => {
-    if (markers.length === 0 && duration) {
-      createNewMarker();
+    if (duration && Object.keys(project).length !== 0) {
+      if (project.sections.length > 0) {
+        const newArr = [];
+        project.sections.forEach(sec => {
+          newArr.push({
+            name: sec.secName,
+            color: sec.color,
+            editMode: false,
+            id: sec._id,
+            targetEmail: sec.targetEmail,
+            targetPhon: sec.targetPhon,
+            secure: sec.secure,
+            allowedWatch: sec.allowedWatch,
+            secondStart: sec.secondStart,
+            secLink: sec.secLink,
+            fullLink: sec.fullLink,
+            seenByOwner: sec.seenByOwner,
+            seenByParticipant: sec.seenByParticipant,
+            vars: sec.vars,
+          });
+        });
+
+        const projectId = paramsPath.id;
+        const newProjects = projects.map(_project => {
+          if (_project._id === projectId) {
+            return project;
+          } else {
+            return _project;
+          }
+        });
+        setProjects(newProjects);
+
+        updateMarkersOnWaveSurfer(newArr);
+        if (editProjectMode) setEditProjectMode(false);
+        // ! if(markers.some(mark => !mark.seenByOwner)) update database to be true by post request
+      } else {
+        createNewMarker();
+      }
       setNewMarkerName("");
       setNewMarkerSecond(3);
     };
     // eslint-disable-next-line
-  }, [duration]);
+  }, [duration, project]);
 
   useEffect(() => {
     if (wavesurferObj) wavesurferObj.setVolume(volume);
@@ -177,7 +225,6 @@ function Project() {
   }
 
   const getValidIncrement = (value) => {
-    console.log(value);
     if (value === 0) return value;
 
     let validValue = value + 1;
@@ -261,12 +308,22 @@ function Project() {
         alpha: 0.5,
         format: "rgba",
       });
+
       const newMarker = {
         secondStart: newMarkerSecond,
         name: newMarkerName,
+        targetEmail: "", //! create useState and inputs
+        targetPhon: "", //! create useState and inputs
+        secure: false, //! create useState and inputs
+        allowedWatch: false, //! create useState and inputs
+        secLink: "", // get from server after saving and update
+        fullLink: "", // get from server after saving and update
+        seenByOwner: true,
+        seenByParticipant: false,
+        vars: [], //! create useState and inputs
         color,
         editMode: false,
-        id: Date.now()
+        id: Date.now() // get from server after saving and update
       }
       const sectionsArr = [...markers, newMarker]
       updateMarkersOnWaveSurfer(sectionsArr);
@@ -287,13 +344,33 @@ function Project() {
   const deleteSection = (id) => {
     const newArr = [...markers];
     const index = newArr.findIndex(sec => sec.id === id);
-    console.log(index);
     if (index === 0) return;
     if (index > -1) newArr.splice(index, 1);
     updateMarkersOnWaveSurfer(newArr);
   }
 
-  console.log(markers);
+  const onEditSaveClick = async () => {
+    if (editProjectMode) {
+      setEditProjectMode(false);
+      const projectId = paramsPath.id;
+      const theToken = token || localStorage.getItem("TOKEN");
+      const data = await updateSections(theToken, projectId, markers);
+      const newProjectObj = JSON.parse(JSON.stringify(project));
+      newProjectObj.sections = data;
+      setProject(newProjectObj);
+    } else {
+      setPreEditWarning(true);
+    }
+  }
+
+  const onDeleteProjectApproved = async () => {
+    navigate('/');
+    const projectId = paramsPath.id;
+    const theToken = token || localStorage.getItem("TOKEN");
+    await deleteProject(theToken, projectId);
+    const newProjects = projects.filter(project => project._id !== projectId);
+    setProjects(newProjects);
+  }
 
   return (
     <div className='project-container'>
@@ -303,7 +380,7 @@ function Project() {
         <AutoDivideScreen duration={duration} create={autoDivideCreate} cancel={() => setAutoDivideMode(false)} />
       </MessageScreen>
       <section className='titles'>
-        <h1 className='center-text'>Project Name</h1>
+        <h1 className='center-text'>{project.projectName}</h1>
         <h6 className='center-text'>edit mode</h6>
       </section>
       <section>
@@ -336,21 +413,41 @@ function Project() {
       </section>
       <section>
         <div className="sections-container">
-          {markers.map(sec => <SectionsEditMode key={sec.id} section={{ ...sec }} duration={duration} onEditMarker={editMarkers} getValidDecrement={getValidDecrement} getValidIncrement={getValidIncrement} onDeleteClick={deleteSection} />)}
+          {markers.map(sec => <SectionsEditMode key={sec.id} section={{ ...sec }} duration={duration} editProjectMode={editProjectMode} onEditMarker={editMarkers} getValidDecrement={getValidDecrement} getValidIncrement={getValidIncrement} onDeleteClick={deleteSection} />)}
         </div>
-        <div className="section-input-container">
-          <div className='new-label-name-container'>
-            <label htmlFor="new-label-name">participant: </label>
-            <input type="text" name="new-label-name" id="new-label-name" value={newMarkerName} ref={nameInput} required onChange={e => onInputChange(e.target.value, setNewMarkerName)} onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
+
+        {editProjectMode
+          &&
+          <div className="section-input-container">
+            <div className='new-label-name-container'>
+              <label htmlFor="new-label-name">participant: </label>
+              <input type="text" name="new-label-name" id="new-label-name" value={newMarkerName} ref={nameInput} required onChange={e => onInputChange(e.target.value, setNewMarkerName)} onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
+            </div>
+            <div className='new-label-sec-container'>
+              <label htmlFor="new-label-sec">second-start: </label>
+              <input type="number" name="new-label-sec" id="new-label-sec" ref={secondInput} min={0} max={duration - 3} step={0.1} required value={newMarkerSecond} onChange={e => onInputChange(parseFloat(e.target.value), setNewMarkerSecond)} onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
+              <button onClick={onDecrementClick} >-</button>
+              <button onClick={onIncrementClick} >+</button>
+            </div>
+            <button onClick={() => setAutoDivideMode(true)} >auto divide</button>
+            <button onClick={createNewMarker}>create</button>
           </div>
-          <div className='new-label-sec-container'>
-            <label htmlFor="new-label-sec">second-start: </label>
-            <input type="number" name="new-label-sec" id="new-label-sec" ref={secondInput} min={0} max={duration - 3} step={0.1} required value={newMarkerSecond} onChange={e => onInputChange(parseFloat(e.target.value), setNewMarkerSecond)} onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
-            <button onClick={onDecrementClick} >-</button>
-            <button onClick={onIncrementClick} >+</button>
-          </div>
-          <button onClick={() => setAutoDivideMode(true)} >auto divide</button>
-          <button onClick={createNewMarker}>create</button>
+        }
+      </section>
+      <section>
+        <div className='edit-save-container'>
+          <button onClick={onEditSaveClick} >{editProjectMode ? "Save" : "Edit"}</button>
+          <button onClick={() => setPreDeleteWarning(true)} >DELETE PROJECT</button>
+          <MessageScreen screenShow={preEditWarning} turnOff={() => setPreEditWarning(false)} >
+            <h2>if u edit VeGO</h2>
+            <button onClick={() => { setEditProjectMode(true); setPreEditWarning(false) }} >OK</button>
+            <button onClick={() => { setPreEditWarning(false) }} >Cancel</button>
+          </MessageScreen>
+          <MessageScreen screenShow={preDeleteWarning} turnOff={() => setPreDeleteWarning(false)} >
+            <h2>DELETE???</h2>
+            <button onClick={() => onDeleteProjectApproved()} >DELETE PROJECT</button>
+            <button onClick={() => setPreDeleteWarning(false)} >Cancel</button>
+          </MessageScreen>
         </div>
       </section>
       <section className="message-container">
