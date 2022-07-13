@@ -1,10 +1,16 @@
 import React from 'react'
+import { useEffect } from 'react';
 import { useRef } from 'react';
 import { useState } from 'react';
 
 function SectionsEditMode({ section, duration, onEditMarker, getValidDecrement, getValidIncrement, onDeleteClick }) {
     const [inputSecond, setInputSecond] = useState("");
-    const inputSecondElement = useRef(null)
+    const inputSecondElement = useRef(null);
+
+    useEffect(() => {
+        setInputSecond(section.secondStart);
+        // eslint-disable-next-line
+    },[section.editMode]);
 
     const handleEditMarker = (editedKey, value, inputElement) => {
         onEditMarker(section.id, editedKey, value, inputElement);
@@ -35,7 +41,7 @@ function SectionsEditMode({ section, duration, onEditMarker, getValidDecrement, 
                 {section.editMode && section.secondStart !== 0
                     ?
                     <>
-                        <input type="number" name="label-sec" id="label-sec" ref={inputSecondElement} min={0} max={duration - 3} value={inputSecond} onChange={e => setInputSecond(e.target.value)} />
+                        <input type="number" name="label-sec" id="label-sec" ref={inputSecondElement} min={0} max={duration - 3} step={0.1} value={inputSecond} onChange={e => setInputSecond(parseFloat(e.target.value))} />
                         <button onClick={() => handleEditMarker("secondStart", inputSecond, inputSecondElement.current)} >HEZ</button>
                         <span>{section.secondStart}</span>
                         <button onClick={onDecrementClick} >-</button>

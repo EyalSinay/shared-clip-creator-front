@@ -11,13 +11,16 @@ import randomColor from "randomcolor";
 import { Beforeunload } from 'react-beforeunload';
 import SpinnerAllPageOnComponent from '../global-components/SpinnerAllPageOnComponent';
 import SectionsEditMode from './SectionsEditMode';
+import MessageScreen from '../global-components/MessageScreen';
+import AutoDivideScreen from './AutoDivideScreen'
 
 function Project() {
   const [wavesurferObj, setWavesurferObj] = useState();
   const waveform = useRef(null);
   const waveformTimeline = useRef(null);
 
-  const [loadingAudio, setLoadingAudio] = useState(true)
+  const [loadingAudio, setLoadingAudio] = useState(true);
+  const [autoDivideMode, setAutoDivideMode] = useState(false);
 
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(1);
@@ -115,7 +118,7 @@ function Project() {
     if (markers.length === 0 && duration) {
       createNewMarker();
       setNewMarkerName("");
-      setNewMarkerSecond("");
+      setNewMarkerSecond(3);
     };
     // eslint-disable-next-line
   }, [duration]);
@@ -162,7 +165,7 @@ function Project() {
     element.setCustomValidity('');
     const term1 = markers.some(marker => {
       if (marker.id === id) return false;
-      return Math.abs(value - marker.secondStart) <= 3;
+      return Math.abs(value - marker.secondStart) < 3;
     });
     const term2 = markers.findIndex(marker => marker.id === id) === 0;
     if (term1) {
@@ -174,6 +177,7 @@ function Project() {
   }
 
   const getValidIncrement = (value) => {
+    console.log(value);
     if (value === 0) return value;
 
     let validValue = value + 1;
@@ -184,7 +188,7 @@ function Project() {
 
     for (let i = j; i < markers.length; i++) {
       if (validValue <= markers[i].secondStart - 3) return validValue;
-        validValue += 5;
+      validValue += markers[i].secondStart - validValue + 3;
     }
     if (validValue >= markers[markers.length - 1].secondStart && validValue <= duration - 3) return validValue;
 
@@ -202,14 +206,25 @@ function Project() {
 
     for (let i = j; i >= 0; i--) {
       if (validValue >= markers[i].secondStart + 3) return validValue;
-        validValue -= 5;
+      validValue -= validValue - markers[i].secondStart + 3;
     }
     if (validValue >= 3 && validValue <= markers[1].secondStart - 3) return validValue;
 
     return value;
   }
 
+  const onIncrementClick = () => {
+    const validValue = getValidIncrement(newMarkerSecond);
+    setNewMarkerSecond(validValue);
+  }
+  const onDecrementClick = () => {
+    const validValue = getValidDecrement(newMarkerSecond);
+    setNewMarkerSecond(validValue);
+  }
+
   const updateMarkersOnWaveSurfer = (marksArr) => {
+    marksArr.sort((secA, secB) => secA.secondStart - secB.secondStart);
+
     for (let i = 0; i < marksArr.length; i++) {
       if (i < marksArr.length - 1) {
         marksArr[i].secondEnd = marksArr[i + 1].secondStart;
@@ -217,8 +232,6 @@ function Project() {
         marksArr[i].secondEnd = duration;
       }
     }
-
-    marksArr.sort((secA, secB) => secA.secondStart - secB.secondStart);
 
     wavesurferObj.clearMarkers();
     marksArr.forEach((mark, index) => {
@@ -236,6 +249,10 @@ function Project() {
     setNewMarkerSecond("");
   }
 
+  const autoDivideCreate = (secondsArr) => {
+    updateMarkersOnWaveSurfer(secondsArr);
+  }
+
   const createNewMarker = () => {
     getCostumeValidate(secondInput.current, newMarkerSecond);
     if (nameInput.current.reportValidity() && secondInput.current.reportValidity()) {
@@ -245,7 +262,7 @@ function Project() {
         format: "rgba",
       });
       const newMarker = {
-        secondStart: parseInt(newMarkerSecond),
+        secondStart: newMarkerSecond,
         name: newMarkerName,
         color,
         editMode: false,
@@ -282,6 +299,9 @@ function Project() {
     <div className='project-container'>
       <SpinnerAllPageOnComponent loading={loadingAudio} />
       <Beforeunload onBeforeunload={(e) => e.preventDefault()} />
+      <MessageScreen screenShow={autoDivideMode} turnOff={() => setAutoDivideMode(false)} >
+        <AutoDivideScreen duration={duration} create={autoDivideCreate} cancel={() => setAutoDivideMode(false)} />
+      </MessageScreen>
       <section className='titles'>
         <h1 className='center-text'>Project Name</h1>
         <h6 className='center-text'>edit mode</h6>
@@ -325,10 +345,11 @@ function Project() {
           </div>
           <div className='new-label-sec-container'>
             <label htmlFor="new-label-sec">second-start: </label>
-            <input type="number" name="new-label-sec" id="new-label-sec" ref={secondInput} min={0} max={duration - 3} required value={newMarkerSecond} onChange={e => onInputChange(e.target.value, setNewMarkerSecond)} onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
-            <button  >-</button>
-            <button  >+</button>
+            <input type="number" name="new-label-sec" id="new-label-sec" ref={secondInput} min={0} max={duration - 3} step={0.1} required value={newMarkerSecond} onChange={e => onInputChange(parseFloat(e.target.value), setNewMarkerSecond)} onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
+            <button onClick={onDecrementClick} >-</button>
+            <button onClick={onIncrementClick} >+</button>
           </div>
+          <button onClick={() => setAutoDivideMode(true)} >auto divide</button>
           <button onClick={createNewMarker}>create</button>
         </div>
       </section>
@@ -339,4 +360,4 @@ function Project() {
   )
 }
 
-export default Project
+export default Project;
