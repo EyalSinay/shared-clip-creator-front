@@ -26,11 +26,13 @@ function SectionsEditMode({
 
     const onIncrementClick = () => {
         const validValue = getValidIncrement(section.secondStart);
+        setInputSecond(validValue);
         onEditMarker(section.id, "secondStart", validValue);
     }
 
     const onDecrementClick = () => {
         const validValue = getValidDecrement(section.secondStart);
+        setInputSecond(validValue);
         onEditMarker(section.id, "secondStart", validValue);
     }
 

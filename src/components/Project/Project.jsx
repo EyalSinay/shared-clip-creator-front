@@ -15,6 +15,7 @@ import SpinnerAllPageOnComponent from '../global-components/SpinnerAllPageOnComp
 import SectionsEditMode from './SectionsEditMode';
 import MessageScreen from '../global-components/MessageScreen';
 import AutoDivideScreen from './AutoDivideScreen';
+import { BASE_URL } from '../../utils/globalConst.js';
 
 function Project() {
   const navigate = useNavigate();
@@ -104,7 +105,7 @@ function Project() {
   useEffect(() => {
     if (wavesurferObj) {
       const projectId = paramsPath.id;
-      wavesurferObj.load("http://127.0.0.1:5050/users/projects/" + projectId + "/audioTrack");
+      wavesurferObj.load(BASE_URL + "/users/projects/" + projectId + "/audioTrack");
     }
   }, [paramsPath.id, wavesurferObj]);
 
@@ -377,6 +378,13 @@ function Project() {
   }
 
 
+  // ! patch request to project rout to update:
+  // ! * scale of movie
+  // ! * allowed
+  // ! * message
+  // ! * maybe in the future allowed user to cut the audio
+
+
   return (
     <div className='project-container'>
       <SpinnerAllPageOnComponent loading={loadingAudio} />
@@ -427,19 +435,28 @@ function Project() {
             </div>
             <div className='new-label-sec-container'>
               <label htmlFor="new-label-sec">second-start: </label>
-              <input type="number" name="new-label-sec" id="new-label-sec" ref={secondInput} min={0} max={duration - 3} step={0.1} required value={newMarkerSecond} onChange={e => onInputChange(parseFloat(e.target.value), setNewMarkerSecond)} onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
+              <input type="number" name="new-label-sec" id="new-label-sec"
+              ref={secondInput} min={0} max={duration - 3} step={0.1} required
+              value={newMarkerSecond}
+              onChange={e => onInputChange(parseFloat(e.target.value), setNewMarkerSecond)}
+              onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
               <button onClick={onDecrementClick} >-</button>
               <button onClick={onIncrementClick} >+</button>
             </div>
-            <button onClick={() => setAutoDivideMode(true)} >auto divide</button>
             <button onClick={createNewMarker}>create</button>
-            <MessageScreen screenShow={autoDivideMode} turnOff={() => setAutoDivideMode(false)} >
-              <AutoDivideScreen project={project} duration={duration} create={autoDivideCreate} cancel={() => setAutoDivideMode(false)} />
-            </MessageScreen>
           </div>
         }
       </section>
       <section>
+        {editProjectMode
+          &&
+          <>
+            <button onClick={() => setAutoDivideMode(true)} >auto divide</button>
+            <MessageScreen screenShow={autoDivideMode} turnOff={() => setAutoDivideMode(false)} >
+              <AutoDivideScreen project={project} duration={duration} create={autoDivideCreate} cancel={() => setAutoDivideMode(false)} />
+            </MessageScreen>
+          </>
+        }
         <div className='edit-save-container'>
           <button onClick={onEditSaveClick} >{editProjectMode ? "Save" : "Edit"}</button>
           <button onClick={() => setPreDeleteWarning(true)} >DELETE PROJECT</button>
@@ -453,6 +470,7 @@ function Project() {
             <button onClick={() => onDeleteProjectApproved()} >DELETE PROJECT</button>
             <button onClick={() => setPreDeleteWarning(false)} >Cancel</button>
           </MessageScreen>
+          <button onClick={() => navigate(`/project/${paramsPath.id}/concatVideo`)} >GET CONCAT VIDEO!</button>
         </div>
       </section>
       <section className="message-container">

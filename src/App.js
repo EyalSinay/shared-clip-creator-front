@@ -7,6 +7,7 @@ import Project from './components/Project/Project';
 import Section from './components/Section/Section';
 import ErrorPage from './components/ErrorPage/ErrorPage';
 import logoImg from './assets/logo.png';
+import ConcatVideo from './components/ConcatVideo/ConcatVideo';
 
 function App() {
   return (
@@ -17,7 +18,8 @@ function App() {
         <Route path='/sign-up' element={<SignUp />} />
         <Route path='/sign-in' element={<SignIn />} />
         <Route path='/project/:id' element={<Project />} />
-        <Route path='/project/:id/:sec' element={<Section />} />
+        <Route path='/project/:id/concatVideo' element={<ConcatVideo />} />
+        <Route path='/project/:id/section/:sec' element={<Section />} />
         <Route path='*' element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
