@@ -11,7 +11,7 @@ function ConcatVideo() {
   const getClip = () => {
     if (!videoUrl) {
       setLoadingVideo(true);
-      axios({
+      axios({ //! add token
         url: `${BASE_URL}/users/projects/${paramsPath.id}/concatVideo`,
         method: 'GET',
         responseType: 'blob',

@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { UserContext } from '../../providers/UserProvider';
 import getSection from '../../utils/getSection.js';
 import uploadVideoTrack from '../../utils/uploadVideoTrack';
+import uploadImageSection from '../../utils/uploadImageSection';
 import { BASE_URL } from '../../utils/globalConst.js';
 import deleteSectionVideoTrack from '../../utils/deleteSectionVideoTrack';
 
@@ -13,8 +14,10 @@ function Section() {
   const [section, setSection] = useState({});
   const [sectionDuration, setSectionDuration] = useState();
   const [videoTrack, setVideoTrack] = useState(null);
+  const [image, setImage] = useState(null);
   const { token } = useContext(UserContext);
-  const projectFileRef = useRef(null);
+  const videoSecFileRef = useRef(null);
+  const imageSecFileRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const videoPlayerRef = useRef(null);
   const [videoTrackDuration, setVideoTrackDuration] = useState(0);
@@ -51,9 +54,9 @@ function Section() {
 
   useEffect(() => {
     if (videoTrackDuration > 0 && videoTrackDuration < sectionDuration) {
-      projectFileRef.current.setCustomValidity("your video is to short");
+      videoSecFileRef.current.setCustomValidity("your video is to short");
     } else {
-      projectFileRef.current.setCustomValidity("");
+      videoSecFileRef.current.setCustomValidity("");
     }
   }, [videoTrackDuration, sectionDuration]);
 
@@ -63,8 +66,8 @@ function Section() {
     }
   }, [section])
 
-  const onSendClick = async () => {
-    if (projectFileRef.current.reportValidity()) {
+  const onSendVideoClick = async () => {
+    if (videoSecFileRef.current.reportValidity()) {
       setLoading(true);
       if (videoTrack) {
         const fd = new FormData();
@@ -76,6 +79,24 @@ function Section() {
           await uploadVideoTrack(theToken, projectId, sectionId, fd);
           // ! show onUploadProgress
           videoPlayerRef.current.load();
+        }
+      }
+      setLoading(false);
+    }
+  }
+
+  const onSendImageClick = async () => {
+    if (imageSecFileRef.current.reportValidity()) {
+      setLoading(true);
+      if (image) {
+        const fd = new FormData();
+        fd.append("image", image, image.name);
+        const projectId = paramsPath.id;
+        const sectionId = paramsPath.sec;
+        const theToken = token || localStorage.getItem("TOKEN") || "";
+        if (section.secure || theToken) {
+          await uploadImageSection(theToken, projectId, sectionId, fd);
+          // ! show onUploadProgress
         }
       }
       setLoading(false);
@@ -100,17 +121,22 @@ function Section() {
       <p>secondStart: {section.secondStart}</p>
       <p>secondEnd: {section.secondEnd}</p>
       <p>duration: {sectionDuration}</p>
-      <input ref={projectFileRef} type="file" name="audioTrack" id="audioTrack" accept='video/mp4' required onChange={(e) => setVideoTrack(e.target.files[0])} />
+      <input ref={videoSecFileRef} type="file" name="videoTrack" id="videoTrack" accept='video/mp4' required onChange={(e) => setVideoTrack(e.target.files[0])} />
+      <input ref={imageSecFileRef} type="file" name="image" id="image" accept='image/png, image/jpeg' required onChange={(e) => setImage(e.target.files[0])} />
       {!loading
         &&
         <>
-          <button onClick={onSendClick} >send</button>
-          <button onClick={onDeleteClick} >delete</button>
+          <button onClick={onSendVideoClick} >send video</button>
+          <button onClick={onSendImageClick} >send image</button>
+          <button onClick={onDeleteClick} >delete file</button>
           <span>{videoTrackDuration.toFixed(2)} second</span>
         </>
       }
       <div className="video-player">
         <video ref={videoPlayerRef} width="400" type="video/mp4" src={`${BASE_URL}/users/projects/${paramsPath.id}/sections/${paramsPath.sec}/videoTrack`} controls />
+      </div>
+      <div>
+        <img style={{width: "50%"}} src={`${BASE_URL}/users/projects/${paramsPath.id}/sections/${paramsPath.sec}/image`} alt="no file" />
       </div>
     </div>
   )
