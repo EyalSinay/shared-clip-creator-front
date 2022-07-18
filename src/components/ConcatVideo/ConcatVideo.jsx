@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { BASE_URL } from '../../utils/globalConst.js';
 import axios from 'axios';
+import NavBar from '../global-components/NavBar.jsx';
+
 
 function ConcatVideo() {
   const paramsPath = useParams();
@@ -30,12 +32,25 @@ function ConcatVideo() {
     )
   }
 
+  const navLinks = [
+    {
+      id: paramsPath.id + 'project',
+      path: `/project/${paramsPath.id}`,
+      context: 'Back to project'
+    }
+  ]
+
   return (
-    <div className='concat-video-page-container'>
-      <h1>Your video:</h1>
-      <button onClick={getClip} >CLICK HEAR!</button>
-      <video width="400" type="video/mp4" src={videoUrl} controls />
-    </div>
+    <>
+      <NavBar linksArr={navLinks}>
+
+      </NavBar>
+      <div className='concat-video-page-container'>
+        <h1>Your video:</h1>
+        <button onClick={getClip} >CLICK HEAR!</button>
+        <video width="400" type="video/mp4" src={videoUrl} controls />
+      </div>
+    </>
   )
 }
 

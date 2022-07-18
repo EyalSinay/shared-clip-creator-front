@@ -16,6 +16,7 @@ import SectionsEditMode from './SectionsEditMode';
 import MessageScreen from '../global-components/MessageScreen';
 import AutoDivideScreen from './AutoDivideScreen';
 import { BASE_URL } from '../../utils/globalConst.js';
+import NavBar from '../global-components/NavBar';
 
 function Project() {
   const navigate = useNavigate();
@@ -377,6 +378,14 @@ function Project() {
     setProjects(newProjects);
   }
 
+  const navLinks = [
+    {
+      id: paramsPath.id + 'concatVideo',
+      path: `/project/${paramsPath.id}/concatVideo`,
+      context: 'CLIP'
+    }
+  ]
+
 
   // ! patch request to project rout to update:
   // ! * scale of movie
@@ -386,98 +395,95 @@ function Project() {
 
 
   return (
-    <div className='project-container'>
+    <>
       <SpinnerAllPageOnComponent loading={loadingAudio} />
       <Beforeunload onBeforeunload={(e) => { if (editProjectMode) e.preventDefault() }} />
-      <section className='titles'>
-        <h1 className='center-text'>{project.projectName}</h1>
-        <h6 className='center-text'>edit mode</h6>
-      </section>
-      <section>
-        <div className="waveform-container" >
-          <div ref={waveform} id="waveform" />
-          <div ref={waveformTimeline} id="waveform-timeline" />
-        </div>
-        <div className="waveform-container controllers-container">
-          <button onClick={handlePlayPause}>{playing ? "PAUSE" : "PLAY"}</button>
-          <button onClick={handleStop}>STOP</button>
-          <button onClick={handleMute}>Mute</button>
-          <input
-            type='range'
-            min='0'
-            max='1'
-            step='0.05'
-            value={volume}
-            onChange={handleVolumeSlider}
-            className='slider volume-slider'
-          />
-          <input
-            type='range'
-            min='1'
-            max='1000'
-            value={zoom}
-            onChange={handleZoomSlider}
-            className='slider zoom-slider'
-          />
-        </div>
-      </section>
-      <section>
-        <div className="sections-container">
-          {markers.map(sec => <SectionsEditMode key={sec.id} section={{ ...sec }} duration={duration} editProjectMode={editProjectMode} onEditMarker={editMarkers} getValidDecrement={getValidDecrement} getValidIncrement={getValidIncrement} onDeleteClick={deleteSection} />)}
-        </div>
+      <NavBar linksArr={navLinks} >
+        <button className='project-btn nav-btn' onClick={onEditSaveClick} >{editProjectMode ? "Save" : "Edit"}</button>
+        {editProjectMode
+          &&
+          <button className='project-btn nav-btn' onClick={() => setAutoDivideMode(true)} >auto divide</button>
+        }
+        <button className='project-btn nav-btn' onClick={() => setPreDeleteWarning(true)} >DELETE PROJECT</button>
+      </NavBar>
+      <MessageScreen screenShow={autoDivideMode} turnOff={() => setAutoDivideMode(false)} >
+        <AutoDivideScreen project={project} duration={duration} create={autoDivideCreate} cancel={() => setAutoDivideMode(false)} />
+      </MessageScreen>
+      <MessageScreen screenShow={preEditWarning} turnOff={() => setPreEditWarning(false)} >
+        <h2>if u edit VeGO</h2>
+        <button onClick={() => { setEditProjectMode(true); setPreEditWarning(false) }} >OK</button>
+        <button onClick={() => { setPreEditWarning(false) }} >Cancel</button>
+      </MessageScreen>
+      <MessageScreen screenShow={preDeleteWarning} turnOff={() => setPreDeleteWarning(false)} >
+        <h2>DELETE???</h2>
+        <button onClick={() => onDeleteProjectApproved()} >DELETE PROJECT</button>
+        <button onClick={() => setPreDeleteWarning(false)} >Cancel</button>
+      </MessageScreen>
 
-        {editProjectMode
-          &&
-          <div className="section-input-container">
-            <div className='new-label-name-container'>
-              <label htmlFor="new-label-name">participant: </label>
-              <input type="text" name="new-label-name" id="new-label-name" value={newMarkerName} ref={nameInput} required onChange={e => onInputChange(e.target.value, setNewMarkerName)} onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
-            </div>
-            <div className='new-label-sec-container'>
-              <label htmlFor="new-label-sec">second-start: </label>
-              <input type="number" name="new-label-sec" id="new-label-sec"
-              ref={secondInput} min={0} max={duration - 3} step={0.1} required
-              value={newMarkerSecond}
-              onChange={e => onInputChange(parseFloat(e.target.value), setNewMarkerSecond)}
-              onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
-              <button onClick={onDecrementClick} >-</button>
-              <button onClick={onIncrementClick} >+</button>
-            </div>
-            <button onClick={createNewMarker}>create</button>
+      <div className='project-container'>
+        <section className='titles'>
+          <h1 className='center-text'>{project.projectName}</h1>
+          <h6 className='center-text'>edit mode</h6>
+        </section>
+        <section>
+          <div className="waveform-container" >
+            <div ref={waveform} id="waveform" />
+            <div ref={waveformTimeline} id="waveform-timeline" />
           </div>
-        }
-      </section>
-      <section>
-        {editProjectMode
-          &&
-          <>
-            <button onClick={() => setAutoDivideMode(true)} >auto divide</button>
-            <MessageScreen screenShow={autoDivideMode} turnOff={() => setAutoDivideMode(false)} >
-              <AutoDivideScreen project={project} duration={duration} create={autoDivideCreate} cancel={() => setAutoDivideMode(false)} />
-            </MessageScreen>
-          </>
-        }
-        <div className='edit-save-container'>
-          <button onClick={onEditSaveClick} >{editProjectMode ? "Save" : "Edit"}</button>
-          <button onClick={() => setPreDeleteWarning(true)} >DELETE PROJECT</button>
-          <MessageScreen screenShow={preEditWarning} turnOff={() => setPreEditWarning(false)} >
-            <h2>if u edit VeGO</h2>
-            <button onClick={() => { setEditProjectMode(true); setPreEditWarning(false) }} >OK</button>
-            <button onClick={() => { setPreEditWarning(false) }} >Cancel</button>
-          </MessageScreen>
-          <MessageScreen screenShow={preDeleteWarning} turnOff={() => setPreDeleteWarning(false)} >
-            <h2>DELETE???</h2>
-            <button onClick={() => onDeleteProjectApproved()} >DELETE PROJECT</button>
-            <button onClick={() => setPreDeleteWarning(false)} >Cancel</button>
-          </MessageScreen>
-          <button onClick={() => navigate(`/project/${paramsPath.id}/concatVideo`)} >GET CONCAT VIDEO!</button>
-        </div>
-      </section>
-      <section className="message-container">
-        <input type="textarea" id='message-input' />
-        {/* create a projectMessage state and update the project in db with PATCH(!) request */}
-      </section>
-    </div>
+          <div className="waveform-container controllers-container">
+            <button onClick={handlePlayPause}>{playing ? "PAUSE" : "PLAY"}</button>
+            <button onClick={handleStop}>STOP</button>
+            <button onClick={handleMute}>Mute</button>
+            <input
+              type='range'
+              min='0'
+              max='1'
+              step='0.05'
+              value={volume}
+              onChange={handleVolumeSlider}
+              className='slider volume-slider'
+            />
+            <input
+              type='range'
+              min='1'
+              max='1000'
+              value={zoom}
+              onChange={handleZoomSlider}
+              className='slider zoom-slider'
+            />
+          </div>
+        </section>
+        <section>
+          <div className="sections-container">
+            {markers.map(sec => <SectionsEditMode key={sec.id} section={{ ...sec }} duration={duration} editProjectMode={editProjectMode} onEditMarker={editMarkers} getValidDecrement={getValidDecrement} getValidIncrement={getValidIncrement} onDeleteClick={deleteSection} />)}
+          </div>
+          {editProjectMode
+            &&
+            <div className="section-input-container">
+              <div className='new-label-name-container'>
+                <label htmlFor="new-label-name">participant: </label>
+                <input type="text" name="new-label-name" id="new-label-name" value={newMarkerName} ref={nameInput} required onChange={e => onInputChange(e.target.value, setNewMarkerName)} onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
+              </div>
+              <div className='new-label-sec-container'>
+                <label htmlFor="new-label-sec">second-start: </label>
+                <input type="number" name="new-label-sec" id="new-label-sec"
+                  ref={secondInput} min={0} max={duration - 3} step={0.1} required
+                  value={newMarkerSecond}
+                  onChange={e => onInputChange(parseFloat(e.target.value), setNewMarkerSecond)}
+                  onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
+                <button onClick={onDecrementClick} >-</button>
+                <button onClick={onIncrementClick} >+</button>
+              </div>
+              <button onClick={createNewMarker}>create</button>
+            </div>
+          }
+        </section>
+        <section className="message-container">
+          <input type="textarea" id='message-input' />
+          {/* create a projectMessage state and update the project in db with PATCH(!) request */}
+        </section>
+      </div>
+    </>
   )
 }
 

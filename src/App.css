@@ -15,10 +15,6 @@ h2{
     margin: auto;
 }
 
-#welcome-link{
-    position: fixed;
-}
-
 .hover-opacity{
     transition: 1s;
 }

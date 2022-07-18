@@ -4,6 +4,7 @@ import SignInForm from './SignInForm'
 import SignOutFirst from './SignOutFirst';
 import Spinner from '../global-components/Spinner';
 import { UserContext } from '../../providers/UserProvider';
+import NavBar from '../global-components/NavBar';
 
 
 function SignIn() {
@@ -15,6 +16,7 @@ function SignIn() {
 
   return (
     <div className="container sign-in">
+      <NavBar />
       <header>
         <h1 className='center-text'>Sign In</h1>
         <h2 className='center-text'>Welcome to Shared Clip Creator</h2>

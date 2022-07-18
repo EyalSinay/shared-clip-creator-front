@@ -1,0 +1,107 @@
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffff;
+    border-bottom: 1px groove rgba(200, 200, 200, 0.5);
+    height: 100px;
+}
+
+.mobile {
+    display: none;
+}
+
+.ul-nav-bar-links {
+    list-style: none;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.li-nav-bar-links,
+.nav-bar-options {
+    height: 100%;
+}
+
+.nav-bar-options {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+#welcome-link-img {
+    height: 80px;
+}
+
+.nav-link {
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 150px;
+    padding: 20px;
+    text-align: center;
+    transition: background-color 1s;
+}
+
+.nav-link:hover {
+    background-color: lightblue;
+}
+
+.nav-btn {
+    /* background: none; */
+    border: 1px solid rgba(200, 200, 200, 0.5);
+    height: 100%;
+    width: 150px;
+    padding: 20px;
+    text-align: center;
+    transition: background-color 1s;
+}
+
+.nav-btn:hover, .open-close-menu:hover {
+    background-color: lightblue;
+    cursor: pointer;
+}
+
+
+.open-close-menu{
+    width: 150px;
+    height: 100px;
+    border: 1px solid rgba(200, 200, 200, 0.5);
+    background-image: url('../../assets/buttons-icons/icons8-menu-48.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 30%;
+    transition: background-color 1s;
+}
+
+.open-menu{
+    position: absolute;
+    top: 100px;
+    border: 1px solid rgba(200, 200, 200, 0.5);
+}
+
+.open-menu__link{
+    background-color: #ffff;
+    height: 100px;
+    border: 1px solid rgba(200, 200, 200, 0.5);
+}
+.open-menu__btn{
+    height: 100px;
+    border: 1px solid rgba(200, 200, 200, 0.5);
+}
+
+
+@media(max-width: 800px) {
+    .desktop {
+        display: none;
+    }
+
+    .mobile {
+        display: flex;
+    }
+}

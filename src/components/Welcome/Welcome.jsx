@@ -1,4 +1,5 @@
 import './Welcome.css'
+import logoImg from '../../assets/logo.png'
 import React, { useContext } from 'react';
 import { UserContext } from '../../providers/UserProvider'
 import UserConnect from './UserConnect';
@@ -14,6 +15,7 @@ function Welcome() {
         <div className='welcome-main-container'>
           <section className='main-welcome-sec welcome-sec'>
             <div className='main-welcome-sec__side1 side'>
+              <img className='logo' src={logoImg} alt="logo" />
               <h2>Shared Clip Creator</h2>
               <h3>Create a collaboration clip in 3 steps</h3>
               <ol>
@@ -22,7 +24,7 @@ function Welcome() {
                 <a href="#welcome-sec4"><li>Send everyone links to their sections</li></a>
               </ol>
               <section>Your participants will receive a simple page where they will be asked to record themselves in a video on top of the sound clip you sent them, or upload a video or photo.</section>
-              <section>Once everyone is done you can have the clip edited and ready!</section>
+              <section>Once everyone is done you can get the clip edited and ready!</section>
             </div>
             <div className='main-welcome-sec__side2 side'>
               {Object.keys(user).length === 0 ? <UserDisConnect /> : <UserConnect user={user} projects={projects} />}

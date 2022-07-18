@@ -35,6 +35,10 @@
     grid-area: side2;
 }
 
+img.logo{
+    width: 100px;
+}
+
 .side {
     display: flex;
     flex-direction: column;
