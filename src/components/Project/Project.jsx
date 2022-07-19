@@ -17,6 +17,7 @@ import MessageScreen from '../global-components/MessageScreen';
 import AutoDivideScreen from './AutoDivideScreen';
 import { BASE_URL } from '../../utils/globalConst.js';
 import NavBar from '../global-components/NavBar';
+import ProjectProperty from './ProjectProperty';
 
 function Project() {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ function Project() {
   const [editProjectMode, setEditProjectMode] = useState(true);
   const [preEditWarning, setPreEditWarning] = useState(false);
   const [preDeleteWarning, setPreDeleteWarning] = useState(false);
+  const [projectPropertyScreen, setProjectPropertyScreen] = useState(false);
 
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(1);
@@ -407,12 +409,12 @@ function Project() {
     }
   ]
 
+  const onSaveProjectPropertyClick = (projectName, scaleVideo, projectAllowed) => {
+    // ! patch request to project rout to update
+  }
+
   // ! Update every vars updating the project, and in markersUpdate add/delete to all markers. update project in dataBase
 
-  // ! patch request to project rout to update:
-  // ! * scale of movie
-  // ! * allowed
-  // ! * message
   // ! * maybe in the future allowed user to cut the audio
 
   return (
@@ -448,6 +450,11 @@ function Project() {
           </button>
         }
         <button
+          className='project-btn nav-btn project-property-btn'
+          onClick={() => setProjectPropertyScreen(true)} >
+          Project property
+        </button>
+        <button
           className='project-btn nav-btn delete-btn'
           onClick={() => setPreDeleteWarning(true)} >
           DELETE PROJECT
@@ -460,6 +467,9 @@ function Project() {
         <h2>if u edit VeGO</h2>
         <button onClick={() => { setEditProjectMode(true); setPreEditWarning(false) }} >OK</button>
         <button onClick={() => { setPreEditWarning(false) }} >Cancel</button>
+      </MessageScreen>
+      <MessageScreen screenShow={projectPropertyScreen} turnOff={() => setProjectPropertyScreen(false)} >
+        <ProjectProperty onCancelClick={setProjectPropertyScreen} project={project} onSaveProjectPropertyClick={onSaveProjectPropertyClick} />
       </MessageScreen>
       <MessageScreen screenShow={preDeleteWarning} turnOff={() => setPreDeleteWarning(false)} >
         <h2>DELETE???</h2>
