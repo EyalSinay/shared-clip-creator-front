@@ -7,9 +7,9 @@ const getSection = async (token, projectId, sectionId) => {
     };
     try {
         const response = await axios.get(BASE_URL + "/users/projects/" + projectId + "/sections/" + sectionId, config);
-        return response.data;
+        return response;
     } catch (err) {
-        console.error(err);
+        return err;
     }
 }
 

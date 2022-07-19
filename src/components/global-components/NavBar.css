@@ -82,6 +82,7 @@ nav {
 .open-menu{
     position: absolute;
     top: 100px;
+    right: 0px;
     border: 1px solid rgba(200, 200, 200, 0.5);
 }
 
@@ -91,8 +92,12 @@ nav {
     border: 1px solid rgba(200, 200, 200, 0.5);
 }
 .open-menu__btn{
-    height: 100px;
     border: 1px solid rgba(200, 200, 200, 0.5);
+}
+
+.open-menu__btn > button{
+    height: 100px;
+    z-index: 90;
 }
 
 
@@ -103,5 +108,12 @@ nav {
 
     .mobile {
         display: flex;
+    }
+
+    .nav-link {
+        flex-direction: column;
+    }
+    .nav-bar-options {
+        flex-direction: column;
     }
 }

@@ -7,6 +7,7 @@ import Project from './components/Project/Project';
 import Section from './components/Section/Section';
 import ErrorPage from './components/ErrorPage/ErrorPage';
 import ConcatVideo from './components/ConcatVideo/ConcatVideo';
+import UnauthorizedParticipant from './components/Section/UnauthorizedParticipant';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path='/project/:id' element={<Project />} />
         <Route path='/project/:id/concatVideo' element={<ConcatVideo />} />
         <Route path='/project/:id/section/:sec' element={<Section />} />
+        <Route path='/UnauthorizedParticipant' element={<UnauthorizedParticipant />} />
         <Route path='*' element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>

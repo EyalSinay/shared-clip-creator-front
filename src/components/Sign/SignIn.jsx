@@ -8,21 +8,23 @@ import NavBar from '../global-components/NavBar';
 
 
 function SignIn() {
-  const {user, loadingUser} = useContext(UserContext);
+  const { user, loadingUser } = useContext(UserContext);
 
   if (loadingUser) {
     return <Spinner />
   }
 
   return (
-    <div className="container sign-in">
+    <>
       <NavBar />
-      <header>
-        <h1 className='center-text'>Sign In</h1>
-        <h2 className='center-text'>Welcome to Shared Clip Creator</h2>
-      </header>
-      {Object.keys(user).length === 0 ? <SignInForm /> : <SignOutFirst user={user} />}
-    </div>
+      <div className="container sign-in">
+        <header>
+          <h1 className='center-text'>Sign In</h1>
+          <h2 className='center-text'>Welcome to Shared Clip Creator</h2>
+        </header>
+        {Object.keys(user).length === 0 ? <SignInForm /> : <SignOutFirst user={user} />}
+      </div>
+    </>
   );
 }
 

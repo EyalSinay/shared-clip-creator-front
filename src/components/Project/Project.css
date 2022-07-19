@@ -48,3 +48,23 @@
   min-height: 200px;
   border-radius: 20px;
 }
+
+.contact-participant{
+  width: 40px;
+  height: 40px;
+  background-image: url('../../assets/buttons-icons/icons8-contact-50\ 1.png');
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.contact-participant:hover{
+  cursor: pointer;
+}
+
+.save-btn{
+  background-color: greenyellow;
+}
+.delete-btn{
+  background-color: red;
+}

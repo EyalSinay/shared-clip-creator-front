@@ -3,19 +3,18 @@ import logoImg from '../../assets/logo.png';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-// import { useEffect } from 'react';
+import { useEffect } from 'react';
 
 
 // linksArr = [{id: 111, path:"/", context:"LINK!"}]
 function NavBar({ children, linksArr = [] }) {
     const [sideBarOpen, setSideBarOpen] = useState(false);
 
-    // useEffect(() => {
-    //     document.addEventListener('scroll', (e) => {
-    //         console.log(e);
-    //         setSideBarOpen(false);
-    //     })
-    // },[])
+    useEffect(() => {
+        document.addEventListener('scroll', (e) => {
+            if(setSideBarOpen) setSideBarOpen(false);
+        })
+    },[])
 
     return (
         <nav>
@@ -35,9 +34,13 @@ function NavBar({ children, linksArr = [] }) {
                 {children}
             </div>
             <div className='mobile'>
-                <div className='open-close-menu' onClick={() => setSideBarOpen(pre => !pre)}>
-
-                </div>
+                {
+                    children !== undefined
+                    &&
+                    linksArr.length !== 0
+                    &&
+                    <div className='open-close-menu' onClick={() => setSideBarOpen(pre => !pre)} />
+                }
                 {
                     sideBarOpen
                     &&
@@ -51,7 +54,7 @@ function NavBar({ children, linksArr = [] }) {
                                 )
                             })}
                         </ul>
-                        <div className='open-menu__btn'>
+                        <div className='nav-bar-options open-menu__btn'>
                             {children}
                         </div>
                     </div>

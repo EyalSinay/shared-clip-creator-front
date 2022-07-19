@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { UserContext } from '../../providers/UserProvider';
 import getSection from '../../utils/getSection.js';
 import NavBar from '../global-components/NavBar'
@@ -13,6 +13,7 @@ import getImageSection from '../../utils/getImageSection';
 
 
 function Section() {
+  const navigate = useNavigate();
   const paramsPath = useParams();
   const [section, setSection] = useState({});
   const [sectionDuration, setSectionDuration] = useState();
@@ -47,11 +48,14 @@ function Section() {
 
     if (Object.keys(section).length === 0) {
       const sectionGetRequest = async () => {
-        const data = await getSection(theToken, projectId, sectionId);
-        if (data) {
-          setSection(data);
+        const response = await getSection(theToken, projectId, sectionId);
+        console.log(response);
+        if (response.status === 200) {
+          setSection(response.data);
+        } else if (response.response.status === 401) {
+          navigate('/UnauthorizedParticipant');
         } else {
-          // ! Show a message like "u need to sign up (link) or ask owner to change secure to false"
+          navigate('/errorPage');
         }
       }
       sectionGetRequest();

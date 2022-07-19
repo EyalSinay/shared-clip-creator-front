@@ -21,3 +21,10 @@ h2{
 .hover-opacity:hover{
     opacity: 0.5;
 }
+
+input{
+    background-color: black;
+    color: #ffff;
+    border-radius: 8px;
+    padding: 4px;
+}

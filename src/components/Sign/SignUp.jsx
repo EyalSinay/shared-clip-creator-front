@@ -4,6 +4,8 @@ import SignUpForm from './SignUpForm';
 import SignOutFirst from './SignOutFirst';
 import Spinner from '../global-components/Spinner';
 import { UserContext } from '../../providers/UserProvider';
+import NavBar from '../global-components/NavBar';
+
 
 function SignUp() {
   const { user, loadingUser } = useContext(UserContext);
@@ -15,7 +17,9 @@ function SignUp() {
 
 
   return (
-    <div className="container sign-up">
+    <>
+      <NavBar />
+      <div className="container sign-up">
         <header>
           <h1 className='center-text'>Sign Up</h1>
           <h2 className='center-text'>
@@ -31,7 +35,8 @@ function SignUp() {
           </h2>
         </header>
         {Object.keys(user).length === 0 ? <SignUpForm /> : <SignOutFirst user={user} />}
-    </div>
+      </div>
+    </>
   );
 }
 

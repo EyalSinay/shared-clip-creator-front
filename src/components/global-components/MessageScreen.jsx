@@ -11,7 +11,8 @@ function MessageScreen({ children, screenShow = false, turnOff = () => { } }) {
 
     return (
         <>
-            {screenShow
+            {
+                screenShow
                 &&
                 <div className='message-background' onClick={onTurnOffClick} >
                     <div className="message-context" >

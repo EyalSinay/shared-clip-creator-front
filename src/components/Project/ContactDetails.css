@@ -1,0 +1,29 @@
+.contact-input-container{
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+}
+
+.input-contact{
+    margin: 8px 0;
+}
+
+.contact-label{
+    width: 40px;
+    height: 40px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.contact-label.email-label{
+    background-image: url('../../assets/buttons-icons/icons8-mail-48\ 1.png');
+}
+
+.contact-label.mobile-label{
+    background-image: url('../../assets/buttons-icons/icons8-whatsapp-48\ 1.png');
+}
+
+
+.vars-main-contact{
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}

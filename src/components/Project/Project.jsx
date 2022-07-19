@@ -56,16 +56,25 @@ function Project() {
       } else if (Object.keys(projects).length === 0 && projects.length > 0) {
         const projectId = paramsPath.id;
         const theProject = projects.find(project => project._id === projectId);
-        setProject(theProject);
+        if (theProject) {
+          setProject(theProject);
+        } else {
+          navigate('/errorPage');
+        }
       } else {
         const projectId = paramsPath.id;
         const theToken = token || localStorage.getItem("TOKEN");
         const fetchProjectData = async () => {
           try {
             const data = await getProjectById(theToken, projectId);
-            setProject(data);
+            if (data) {
+              setProject(data);
+            } else {
+              navigate('/errorPage');
+            }
           } catch (err) {
             console.error(err);
+            navigate('/errorPage');
           }
         }
         fetchProjectData();
@@ -128,30 +137,35 @@ function Project() {
     }
   }, [wavesurferObj]);
 
+  const getNewMarkersArrFromProject = () => {
+    const newArr = [];
+    project.sections.forEach(sec => {
+      newArr.push({
+        name: sec.secName,
+        projectName: sec.projectName,
+        color: sec.color,
+        editMode: false,
+        id: sec._id,
+        targetEmail: sec.targetEmail,
+        targetPhon: sec.targetPhon,
+        secure: sec.secure,
+        allowedWatch: sec.allowedWatch,
+        secondStart: sec.secondStart,
+        secLink: sec.secLink,
+        fullLink: sec.fullLink,
+        seenByOwner: sec.seenByOwner,
+        seenByParticipant: sec.seenByParticipant,
+        vars: sec.vars,
+        massage: sec.massage,
+      });
+    });
+    return newArr;
+  }
+
   useEffect(() => {
     if (duration && Object.keys(project).length !== 0) {
       if (project.sections.length > 0) {
-        const newArr = [];
-        project.sections.forEach(sec => {
-          newArr.push({
-            name: sec.secName,
-            projectName: sec.projectName,
-            color: sec.color,
-            editMode: false,
-            id: sec._id,
-            targetEmail: sec.targetEmail,
-            targetPhon: sec.targetPhon,
-            secure: sec.secure,
-            allowedWatch: sec.allowedWatch,
-            secondStart: sec.secondStart,
-            secLink: sec.secLink,
-            fullLink: sec.fullLink,
-            seenByOwner: sec.seenByOwner,
-            seenByParticipant: sec.seenByParticipant,
-            vars: sec.vars,
-            massage: sec.massage,
-          });
-        });
+        const newArr = getNewMarkersArrFromProject();
 
         const projectId = paramsPath.id;
         const newProjects = projects.map(_project => {
@@ -297,7 +311,7 @@ function Project() {
 
     setMarkers(marksArr);
     setNewMarkerName("");
-    setNewMarkerSecond("");
+    setNewMarkerSecond(3);
   }
 
   const autoDivideCreate = (secondsArr) => {
@@ -325,7 +339,7 @@ function Project() {
         fullLink: "", // get from server after saving and update
         seenByOwner: true,
         seenByParticipant: false,
-        vars: [], //! create useState and inputs
+        vars: [{ key: 'NAME', value: '' }, { key: 'LYRICS', value: '' }], //! create useState and inputs
         massage: "some message", //! create useState and inputs
         color,
         editMode: false,
@@ -361,12 +375,19 @@ function Project() {
       const projectId = paramsPath.id;
       const theToken = token || localStorage.getItem("TOKEN");
       const data = await updateSections(theToken, projectId, markers);
+      // ! update project - use promise.all
       const newProjectObj = JSON.parse(JSON.stringify(project));
       newProjectObj.sections = data;
       setProject(newProjectObj);
     } else {
       setPreEditWarning(true);
     }
+  }
+
+  const cancelEditMode = () => {
+    setEditProjectMode(false);
+    const newArr = getNewMarkersArrFromProject();
+    updateMarkersOnWaveSurfer(newArr);
   }
 
   const onDeleteProjectApproved = async () => {
@@ -386,6 +407,7 @@ function Project() {
     }
   ]
 
+  // ! Update every vars updating the project, and in markersUpdate add/delete to all markers. update project in dataBase
 
   // ! patch request to project rout to update:
   // ! * scale of movie
@@ -393,18 +415,43 @@ function Project() {
   // ! * message
   // ! * maybe in the future allowed user to cut the audio
 
-
   return (
     <>
       <SpinnerAllPageOnComponent loading={loadingAudio} />
       <Beforeunload onBeforeunload={(e) => { if (editProjectMode) e.preventDefault() }} />
       <NavBar linksArr={navLinks} >
-        <button className='project-btn nav-btn' onClick={onEditSaveClick} >{editProjectMode ? "Save" : "Edit"}</button>
-        {editProjectMode
+        <button
+          className={`project-btn nav-btn ${editProjectMode ? "save" : "edit"}-btn`}
+          onClick={onEditSaveClick} >
+          {editProjectMode ? "Save" : "Edit"}
+        </button>
+        {
+          editProjectMode
           &&
-          <button className='project-btn nav-btn' onClick={() => setAutoDivideMode(true)} >auto divide</button>
+          Object.keys(project).length !== 0
+          &&
+          project.sections.length > 0
+          &&
+          <button
+            className='project-btn nav-btn cancel-edit-mode-btn'
+            onClick={cancelEditMode} >
+            Cancel
+          </button>
         }
-        <button className='project-btn nav-btn' onClick={() => setPreDeleteWarning(true)} >DELETE PROJECT</button>
+        {
+          editProjectMode
+          &&
+          <button
+            className='project-btn nav-btn auto-divide-btn'
+            onClick={() => setAutoDivideMode(true)} >
+            auto divide
+          </button>
+        }
+        <button
+          className='project-btn nav-btn delete-btn'
+          onClick={() => setPreDeleteWarning(true)} >
+          DELETE PROJECT
+        </button>
       </NavBar>
       <MessageScreen screenShow={autoDivideMode} turnOff={() => setAutoDivideMode(false)} >
         <AutoDivideScreen project={project} duration={duration} create={autoDivideCreate} cancel={() => setAutoDivideMode(false)} />
@@ -455,9 +502,20 @@ function Project() {
         </section>
         <section>
           <div className="sections-container">
-            {markers.map(sec => <SectionsEditMode key={sec.id} section={{ ...sec }} duration={duration} editProjectMode={editProjectMode} onEditMarker={editMarkers} getValidDecrement={getValidDecrement} getValidIncrement={getValidIncrement} onDeleteClick={deleteSection} />)}
+            {
+              markers.map(sec => <SectionsEditMode
+                key={sec.id}
+                section={{ ...sec }}
+                duration={duration}
+                editProjectMode={editProjectMode}
+                onEditMarker={editMarkers}
+                getValidDecrement={getValidDecrement}
+                getValidIncrement={getValidIncrement}
+                onDeleteClick={deleteSection} />)
+            }
           </div>
-          {editProjectMode
+          {
+            editProjectMode
             &&
             <div className="section-input-container">
               <div className='new-label-name-container'>
