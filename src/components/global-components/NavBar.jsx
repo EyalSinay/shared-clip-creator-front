@@ -12,9 +12,15 @@ function NavBar({ children, linksArr = [] }) {
 
     useEffect(() => {
         document.addEventListener('scroll', (e) => {
-            if(setSideBarOpen) setSideBarOpen(false);
-        })
-    },[])
+            if (setSideBarOpen) setSideBarOpen(false);
+        });
+    }, []);
+
+    const onBackSideBarClick = (e) => {
+        if (e.target === e.currentTarget) {
+            setSideBarOpen(false);
+        }
+    }
 
     return (
         <nav>
@@ -44,18 +50,20 @@ function NavBar({ children, linksArr = [] }) {
                 {
                     sideBarOpen
                     &&
-                    <div className='open-menu'>
-                        <ul className='ul-nav-bar-links'>
-                            {linksArr.map(link => {
-                                return (
-                                    <li className='li-nav-bar-links' key={link.id} >
-                                        <Link className='nav-link open-menu__link' to={link.path}>{link.context}</Link>
-                                    </li>
-                                )
-                            })}
-                        </ul>
-                        <div className='nav-bar-options open-menu__btn'>
-                            {children}
+                    <div onClick={onBackSideBarClick} className="back-side-bar">
+                        <div className='open-menu'>
+                            <ul className='ul-nav-bar-links'>
+                                {linksArr.map(link => {
+                                    return (
+                                        <li className='li-nav-bar-links' key={link.id} >
+                                            <Link className='nav-link open-menu__link' to={link.path}>{link.context}</Link>
+                                        </li>
+                                    )
+                                })}
+                            </ul>
+                            <div className='nav-bar-options open-menu__btn'>
+                                {children}
+                            </div>
                         </div>
                     </div>
                 }

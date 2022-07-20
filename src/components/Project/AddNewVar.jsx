@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 
-function AddNewVar({varsContact, setVarsContact}) {
+function AddNewVar({varsContact, setVarsContact, setAddNewVarMode}) {
     const [newKey, setNewKey] = useState("");
     const [newValue, setNewValue] = useState("");
     const newKeyRef = useRef(null);
@@ -17,6 +17,7 @@ function AddNewVar({varsContact, setVarsContact}) {
             setVarsContact(newVarsArr);
             setNewKey("");
             setNewValue("");
+            setAddNewVarMode(false);
         }
     }
 

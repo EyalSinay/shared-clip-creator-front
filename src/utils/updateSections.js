@@ -11,15 +11,14 @@ const updateSections = async (token, projectId, sectionsArr) => {
             targetEmail: sec.targetEmail,
             targetPhon: sec.targetPhon,
             secure: sec.secure,
-            allowedWatch: sec.allowedWatch,
             secondStart: sec.secondStart,
             secondEnd: sec.secondEnd,
             seenByOwner: sec.seenByOwner,
+            volumeVideoTrack: sec.volumeVideoTrack,
             vars: sec.vars,
-            massage: sec.massage,
         });
     });
-
+  
     const config = {
         headers: { Authorization: `Bearer ${token}` }
     };

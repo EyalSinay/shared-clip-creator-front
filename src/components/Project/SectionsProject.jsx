@@ -12,7 +12,8 @@ function SectionsEditMode({
     getValidDecrement,
     getValidIncrement,
     onDeleteClick,
-    editProjectMode
+    editProjectMode,
+    onSaveParticipantDetailsClick
 }) {
     const [inputSecond, setInputSecond] = useState("");
     const inputSecondElement = useRef(null);
@@ -25,6 +26,19 @@ function SectionsEditMode({
 
     const handleEditMarker = (editedKey, value, inputElement) => {
         onEditMarker(section.id, editedKey, value, inputElement);
+    }
+
+    const onConcatDetailsSaveClick = ({ emailContact, mobileContact, volumeParticipant, secure, varsContact }) => {
+        const newObj = {
+            targetEmail: emailContact,
+            targetPhon: mobileContact,
+            volumeVideoTrack: volumeParticipant,
+            secure: secure,
+            vars: varsContact
+        }
+        console.log("hi ani secure", secure);
+        onSaveParticipantDetailsClick(newObj, section.id);
+        // setContactDetailsOpen(false);
     }
 
     const onIncrementClick = () => {
@@ -55,11 +69,15 @@ function SectionsEditMode({
                         <span>{section.name}</span>
                 }
             </div>
-            <div onClick={() => setContactDetailsOpen(true)} className='contact-participant hover-opacity' />
+            {
+                !editProjectMode
+                &&
+                <div onClick={() => setContactDetailsOpen(true)} className='contact-participant hover-opacity' />
+                }
             <MessageScreen screenShow={contactDetailsOpen} turnOff={() => setContactDetailsOpen(false)} >
                 <ContactDetails
                     section={section}
-                    onSaveClick={(contactDetails) => handleEditMarker('vars', contactDetails)}
+                    onSaveClick={onConcatDetailsSaveClick}
                     onCancelClick={() => setContactDetailsOpen(false)}
                 />
             </MessageScreen>

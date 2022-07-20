@@ -16,6 +16,8 @@ function AutoDivideScreen({ project, duration, create, cancel }) {
                     format: "rgba",
                 });
 
+                const vars = project.varsKeys.map(variable => ({key: variable, value: ""}));
+
                 const newMarker = {
                     secondStart: Math.round((duration / participantNum) * i * 10) / 10,
                     name: "sec" + (i + 1),
@@ -28,8 +30,8 @@ function AutoDivideScreen({ project, duration, create, cancel }) {
                     fullLink: "",
                     seenByOwner: true,
                     seenByParticipant: false,
-                    vars: [],
-                    massage: "",
+                    volumeVideoTrack: 1,
+                    vars,
                     color,
                     editMode: false,
                     id: Date.now() + i

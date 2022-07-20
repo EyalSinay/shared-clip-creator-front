@@ -151,21 +151,20 @@ function Project() {
         targetEmail: sec.targetEmail,
         targetPhon: sec.targetPhon,
         secure: sec.secure,
-        allowedWatch: sec.allowedWatch,
         secondStart: sec.secondStart,
         secLink: sec.secLink,
         fullLink: sec.fullLink,
         seenByOwner: sec.seenByOwner,
         seenByParticipant: sec.seenByParticipant,
+        volumeVideoTrack: sec.volumeVideoTrack,
         vars: sec.vars,
-        massage: sec.massage,
       });
     });
     return newArr;
   }
 
   useEffect(() => {
-    if (duration && Object.keys(project).length !== 0) {
+    if (Object.keys(project).length !== 0) {
       const projectId = paramsPath.id;
       const newProjects = projects.map(_project => {
         if (_project._id === projectId) {
@@ -175,7 +174,12 @@ function Project() {
         }
       });
       setProjects(newProjects);
-      
+    };
+    // eslint-disable-next-line
+  }, [project]);
+
+  useEffect(() => {
+    if (duration && Object.keys(project).length !== 0 && markers.length === 0) {
       if (project.sections.length > 0) {
         const newArr = getNewMarkersArrFromProject();
         updateMarkersOnWaveSurfer(newArr);
@@ -186,7 +190,7 @@ function Project() {
       }
       setNewMarkerName("");
       setNewMarkerSecond(3);
-    };
+    }
     // eslint-disable-next-line
   }, [duration, project]);
 
@@ -239,7 +243,7 @@ function Project() {
       element.setCustomValidity("Please ensure a difference of 3 seconds between the participants");
     }
     if (term2) {
-      element.setCustomValidity("It is requierd to be section in second 0");
+      element.setCustomValidity("It is required to be section in second 0");
     }
   }
 
@@ -328,23 +332,24 @@ function Project() {
         format: "rgba",
       });
 
+      const vars = project.varsKeys.map(variable => ({ key: variable, value: "" }));
+
       const newMarker = {
         secondStart: newMarkerSecond,
         name: newMarkerName,
         projectName: project.projectName,
-        targetEmail: "abc@def.com", //! create useState and inputs
-        targetPhon: "0543216933", //! create useState and inputs
-        secure: false, //! create useState and inputs
-        allowedWatch: false, //! create useState and inputs
+        targetEmail: "",
+        targetPhon: "",
+        secure: false,
         secLink: "", // get from server after saving and update
         fullLink: "", // get from server after saving and update
-        seenByOwner: true,
-        seenByParticipant: false,
-        vars: [{ key: 'NAME', value: '' }, { key: 'LYRICS', value: '' }], //! create useState and inputs
-        massage: "some message", //! create useState and inputs
+        seenByOwner: true, //!
+        seenByParticipant: false, //!
+        volumeVideoTrack: 1,
+        vars,
         color,
         editMode: false,
-        id: Date.now() // get from server after saving and update
+        id: Date.now() // get from server after saving a new id
       }
       const sectionsArr = [...markers, newMarker]
       updateMarkersOnWaveSurfer(sectionsArr);
@@ -373,16 +378,24 @@ function Project() {
   const onEditSaveClick = async () => {
     if (editProjectMode) {
       setEditProjectMode(false);
-      const projectId = paramsPath.id;
-      const theToken = token || localStorage.getItem("TOKEN");
-      const data = await updateSections(theToken, projectId, markers);
-      // ! update project - use promise.all
-      const newProjectObj = JSON.parse(JSON.stringify(project));
-      newProjectObj.sections = data;
-      setProject(newProjectObj);
+      await updateSectionsInDb()
     } else {
       setPreEditWarning(true);
     }
+  }
+
+  const updateSectionsInDb = async (sections) => {
+    // ! spinner on
+    sections = sections ? sections : markers;
+
+    const projectId = paramsPath.id;
+    const theToken = token || localStorage.getItem("TOKEN");
+    const data = await updateSections(theToken, projectId, sections);
+    console.log(data);
+    const newProjectObj = JSON.parse(JSON.stringify(project));
+    newProjectObj.sections = data;
+    setProject(newProjectObj);
+    // ! spinner off
   }
 
   const cancelEditMode = () => {
@@ -400,13 +413,29 @@ function Project() {
     setProjects(newProjects);
   }
 
-  const navLinks = [
-    {
-      id: paramsPath.id + 'concatVideo',
-      path: `/project/${paramsPath.id}/concatVideo`,
-      context: 'CLIP'
-    }
-  ]
+  const onSaveParticipantDetailsClick = async (objUpdated, id) => {
+    const varsKeysArr = objUpdated.vars.map(variable => variable.key)
+
+    const newMarkersArr = markers.map(mark => {
+      if (mark.id === id) {
+        for (let key in objUpdated) {
+          mark[key] = objUpdated[key];
+        }
+      } else {
+        varsKeysArr.forEach(keyVar => {
+          if (!mark.vars.some(variable => variable.key === keyVar)) {
+            mark.vars.push({ key: keyVar, value: "" });
+          }
+        });
+        mark.vars = mark.vars.filter(variable => varsKeysArr.includes(variable.key));
+      }
+      return mark;
+    });
+    setMarkers(newMarkersArr);
+    await updateSectionsInDb();
+
+    await updateProjectInDb({ varsKeys: varsKeysArr });
+  }
 
   const onSaveProjectOptionsClick = async (projectName, scaleVideo, projectAllowed, volumeAudioTrack) => {
     const bodyObj = {
@@ -415,16 +444,46 @@ function Project() {
       allowed: projectAllowed,
       volumeAudioTrack
     }
-    const projectId = paramsPath.id;
-    const theToken = token || localStorage.getItem("TOKEN");
-    const data = await updateProject(theToken, projectId, bodyObj);
-    setProject(data);
+
+    const newMarkers = markers.map(mark => {
+      mark.projectName = projectName;
+      return mark;
+    });
+    setMarkers(newMarkers);
+
+    const newProjectObj = JSON.parse(JSON.stringify(project)); // for saving even in cancel editProjectMode
+    newProjectObj.sections.map(mark => {
+      mark.projectName = projectName;
+      return mark;
+    });
+    setProject(newProjectObj);
+
+    await updateSectionsInDb(newProjectObj.sections);
+
+    await updateProjectInDb(bodyObj);
     setProjectOptionsScreen(false);
   }
 
-  // ! Update every vars updating the project, and in markersUpdate add/delete to all markers. update project in dataBase
+  const updateProjectInDb = async (objToUpdate) => {
+    // ! spinner on
+    const projectId = paramsPath.id;
+    const theToken = token || localStorage.getItem("TOKEN");
+    const data = await updateProject(theToken, projectId, objToUpdate);
+    if (data !== undefined) {
+      setProject(data);
+    } else {
+      // ! show message
+    }
+    // ! spinner off
+  }
 
-  // ! * maybe in the future allowed user to cut the audio
+  const navLinks = [
+    {
+      id: paramsPath.id + 'concatVideo',
+      path: `/project/${paramsPath.id}/concatVideo`,
+      context: 'CLIP'
+    }
+  ];
 
   return (
     <>
@@ -525,7 +584,8 @@ function Project() {
                 onEditMarker={editMarkers}
                 getValidDecrement={getValidDecrement}
                 getValidIncrement={getValidIncrement}
-                onDeleteClick={deleteSection} />)
+                onDeleteClick={deleteSection}
+                onSaveParticipantDetailsClick={onSaveParticipantDetailsClick} />)
             }
           </div>
           {

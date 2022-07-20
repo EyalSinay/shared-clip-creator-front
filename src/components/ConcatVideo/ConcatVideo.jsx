@@ -26,6 +26,8 @@ function ConcatVideo() {
 
   //! get project by id just for check auth
 
+  //! if section.length === 0 show message!
+
   if (loadingVideo) {
     return (
       <div>We are preparing your clip for you, it will take some time...</div>
