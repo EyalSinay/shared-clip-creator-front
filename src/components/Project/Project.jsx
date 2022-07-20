@@ -9,6 +9,7 @@ import * as WaveformCursorPlugin from "wavesurfer.js/dist/plugin/wavesurfer.curs
 import getProjectById from '../../utils/getProjectById.js';
 import updateSections from '../../utils/updateSections.js';
 import deleteProject from '../../utils/deleteProject.js';
+import updateProject from '../../utils/updateProject.js'
 import randomColor from "randomcolor";
 import { Beforeunload } from 'react-beforeunload';
 import SpinnerAllPageOnComponent from '../global-components/SpinnerAllPageOnComponent';
@@ -17,7 +18,7 @@ import MessageScreen from '../global-components/MessageScreen';
 import AutoDivideScreen from './AutoDivideScreen';
 import { BASE_URL } from '../../utils/globalConst.js';
 import NavBar from '../global-components/NavBar';
-import ProjectProperty from './ProjectProperty';
+import ProjectOptions from './ProjectOptions';
 
 function Project() {
   const navigate = useNavigate();
@@ -30,8 +31,7 @@ function Project() {
   const [autoDivideMode, setAutoDivideMode] = useState(false);
   const [editProjectMode, setEditProjectMode] = useState(true);
   const [preEditWarning, setPreEditWarning] = useState(false);
-  const [preDeleteWarning, setPreDeleteWarning] = useState(false);
-  const [projectPropertyScreen, setProjectPropertyScreen] = useState(false);
+  const [projectOptionsScreen, setProjectOptionsScreen] = useState(false);
 
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(1);
@@ -166,19 +166,18 @@ function Project() {
 
   useEffect(() => {
     if (duration && Object.keys(project).length !== 0) {
+      const projectId = paramsPath.id;
+      const newProjects = projects.map(_project => {
+        if (_project._id === projectId) {
+          return project;
+        } else {
+          return _project;
+        }
+      });
+      setProjects(newProjects);
+      
       if (project.sections.length > 0) {
         const newArr = getNewMarkersArrFromProject();
-
-        const projectId = paramsPath.id;
-        const newProjects = projects.map(_project => {
-          if (_project._id === projectId) {
-            return project;
-          } else {
-            return _project;
-          }
-        });
-        setProjects(newProjects);
-
         updateMarkersOnWaveSurfer(newArr);
         if (editProjectMode) setEditProjectMode(false);
         // ! if(markers.some(mark => !mark.seenByOwner)) update database to be true by post request
@@ -409,8 +408,18 @@ function Project() {
     }
   ]
 
-  const onSaveProjectPropertyClick = (projectName, scaleVideo, projectAllowed) => {
-    // ! patch request to project rout to update
+  const onSaveProjectOptionsClick = async (projectName, scaleVideo, projectAllowed, volumeAudioTrack) => {
+    const bodyObj = {
+      projectName,
+      scaleVideo,
+      allowed: projectAllowed,
+      volumeAudioTrack
+    }
+    const projectId = paramsPath.id;
+    const theToken = token || localStorage.getItem("TOKEN");
+    const data = await updateProject(theToken, projectId, bodyObj);
+    setProject(data);
+    setProjectOptionsScreen(false);
   }
 
   // ! Update every vars updating the project, and in markersUpdate add/delete to all markers. update project in dataBase
@@ -451,13 +460,8 @@ function Project() {
         }
         <button
           className='project-btn nav-btn project-property-btn'
-          onClick={() => setProjectPropertyScreen(true)} >
-          Project property
-        </button>
-        <button
-          className='project-btn nav-btn delete-btn'
-          onClick={() => setPreDeleteWarning(true)} >
-          DELETE PROJECT
+          onClick={() => setProjectOptionsScreen(true)} >
+          Project options
         </button>
       </NavBar>
       <MessageScreen screenShow={autoDivideMode} turnOff={() => setAutoDivideMode(false)} >
@@ -468,13 +472,13 @@ function Project() {
         <button onClick={() => { setEditProjectMode(true); setPreEditWarning(false) }} >OK</button>
         <button onClick={() => { setPreEditWarning(false) }} >Cancel</button>
       </MessageScreen>
-      <MessageScreen screenShow={projectPropertyScreen} turnOff={() => setProjectPropertyScreen(false)} >
-        <ProjectProperty onCancelClick={setProjectPropertyScreen} project={project} onSaveProjectPropertyClick={onSaveProjectPropertyClick} />
-      </MessageScreen>
-      <MessageScreen screenShow={preDeleteWarning} turnOff={() => setPreDeleteWarning(false)} >
-        <h2>DELETE???</h2>
-        <button onClick={() => onDeleteProjectApproved()} >DELETE PROJECT</button>
-        <button onClick={() => setPreDeleteWarning(false)} >Cancel</button>
+      <MessageScreen screenShow={projectOptionsScreen} turnOff={() => setProjectOptionsScreen(false)} >
+        <ProjectOptions
+          onCancelClick={setProjectOptionsScreen}
+          project={project}
+          onSaveProjectOptionsClick={onSaveProjectOptionsClick}
+          onDeleteProjectApproved={onDeleteProjectApproved}
+        />
       </MessageScreen>
 
       <div className='project-container'>

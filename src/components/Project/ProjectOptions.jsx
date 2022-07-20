@@ -1,13 +1,17 @@
-import noSignalGif from '../../assets/gifs/no-signal.gif'
-import React, { useRef } from 'react'
-import { useState } from 'react'
+import noSignalGif from '../../assets/gifs/no-signal.gif';
+import React, { useRef } from 'react';
+import { useState } from 'react';
+import MessageScreen from '../global-components/MessageScreen';
 
-function ProjectProperty({ onCancelClick, project, onSaveProjectPropertyClick }) {
+function ProjectOptions({ onCancelClick, project, onSaveProjectOptionsClick, onDeleteProjectApproved }) {
     const [projectName, setProjectName] = useState("");
     const [scaleVideo, setScaleVideo] = useState("");
-    const [projectAllowed, setProjectAllowed] = useState(false)
+    const [volumeAudioTrack, setVolumeAudioTrack] = useState(1);
+    const [projectAllowed, setProjectAllowed] = useState(false);
+    const [preDeleteWarning, setPreDeleteWarning] = useState(false);
     const projectNameRef = useRef(null);
     const scaleVideoRef = useRef(null);
+    const volumeAudioTrackRef = useRef(null);
     const projectAllowedRef = useRef(null);
 
     useState(() => {
@@ -15,6 +19,7 @@ function ProjectProperty({ onCancelClick, project, onSaveProjectPropertyClick })
             setProjectName(project.projectName);
             setScaleVideo(project.scaleVideo);
             setProjectAllowed(project.allowed);
+            setVolumeAudioTrack(project.volumeAudioTrack);
         }
     }, [project]);
 
@@ -25,8 +30,10 @@ function ProjectProperty({ onCancelClick, project, onSaveProjectPropertyClick })
             scaleVideoRef.current.checkValidity()
             &&
             projectAllowedRef.current.checkValidity()
+            &&
+            volumeAudioTrackRef.current.checkValidity()
         ) {
-            onSaveProjectPropertyClick(projectName, scaleVideo, projectAllowed);
+            onSaveProjectOptionsClick(projectName, scaleVideo, projectAllowed, volumeAudioTrack);
         }
     }
 
@@ -76,7 +83,7 @@ function ProjectProperty({ onCancelClick, project, onSaveProjectPropertyClick })
             </div>
             <div className="project-scale-video-container">
                 <label htmlFor="project-scale-video">Project scale video</label>
-                <select ref={scaleVideoRef} name="project-scale-video" id="project-scale-video" required
+                <select ref={scaleVideoRef} name="project-scale-video" id="project-scale-video"
                     value={scaleVideo}
                     onChange={(e) => setScaleVideo(e.target.value)}
                 >
@@ -89,6 +96,18 @@ function ProjectProperty({ onCancelClick, project, onSaveProjectPropertyClick })
                     </div>
                 </div>
             </div>
+            <div className="volume-audio-container">
+                <input name="volume-audio" id="volume-audio" ref={volumeAudioTrackRef}
+                    type='range'
+                    min='0'
+                    max='1'
+                    step='0.01'
+                    value={volumeAudioTrack}
+                    onChange={e => setVolumeAudioTrack(e.target.value)}
+                    className='slider volume-slider'
+                />
+                <span>{Math.round(volumeAudioTrack * 100)}</span>
+            </div>
             <div className="project-paying-container">
                 <label htmlFor="paying">pay 💰</label>
                 <input ref={projectAllowedRef} type="checkbox" name="paying" id="paying"
@@ -96,10 +115,22 @@ function ProjectProperty({ onCancelClick, project, onSaveProjectPropertyClick })
                     onChange={(e) => setProjectAllowed(e.target.checked)}
                 />
             </div>
+            <div className="delete-project-container">
+                <button
+                    className='delete-btn'
+                    onClick={() => setPreDeleteWarning(true)} >
+                    DELETE PROJECT
+                </button>
+                <MessageScreen screenShow={preDeleteWarning} turnOff={() => setPreDeleteWarning(false)} >
+                    <h2>DELETE???</h2>
+                    <button onClick={() => onDeleteProjectApproved()} >DELETE PROJECT</button>
+                    <button onClick={() => setPreDeleteWarning(false)} >Cancel</button>
+                </MessageScreen>
+            </div>
             <button onClick={() => onSaveClick()} >Save</button>
             <button onClick={() => onCancelClick(false)} >Cancel</button>
         </div>
     )
 }
 
-export default ProjectProperty
+export default ProjectOptions
