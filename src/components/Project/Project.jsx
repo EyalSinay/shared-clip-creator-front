@@ -13,7 +13,7 @@ import updateProject from '../../utils/updateProject.js'
 import randomColor from "randomcolor";
 import { Beforeunload } from 'react-beforeunload';
 import SpinnerAllPageOnComponent from '../global-components/SpinnerAllPageOnComponent';
-import SectionsEditMode from './SectionsEditMode';
+import SectionsProject from './SectionsProject';
 import MessageScreen from '../global-components/MessageScreen';
 import AutoDivideScreen from './AutoDivideScreen';
 import { BASE_URL } from '../../utils/globalConst.js';
@@ -517,7 +517,7 @@ function Project() {
         <section>
           <div className="sections-container">
             {
-              markers.map(sec => <SectionsEditMode
+              markers.map(sec => <SectionsProject
                 key={sec.id}
                 section={{ ...sec }}
                 duration={duration}

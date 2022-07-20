@@ -58,9 +58,10 @@ function SectionsEditMode({
             <div onClick={() => setContactDetailsOpen(true)} className='contact-participant hover-opacity' />
             <MessageScreen screenShow={contactDetailsOpen} turnOff={() => setContactDetailsOpen(false)} >
                 <ContactDetails
-                section={section}
-                onSaveClick={(contactDetails) => handleEditMarker('vars', contactDetails)}
-                onCancelClick={() => setContactDetailsOpen(false)} />
+                    section={section}
+                    onSaveClick={(contactDetails) => handleEditMarker('vars', contactDetails)}
+                    onCancelClick={() => setContactDetailsOpen(false)}
+                />
             </MessageScreen>
             <div className='label-sec-container'>
                 <label htmlFor="label-sec">time: </label>

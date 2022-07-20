@@ -14,8 +14,13 @@ function MessageScreen({ children, screenShow = false, turnOff = () => { } }) {
             {
                 screenShow
                 &&
-                <div className='message-background' onClick={onTurnOffClick} >
-                    <div className="message-context" >
+                <div className='message-background'
+                    onClick={onTurnOffClick}
+                >
+                    <div className="message-context"
+                        onKeyDown={e => { if (e.key === 'Escape') onTurnOffClick() }} //!? not working
+                        tabIndex="0"
+                    >
                         {children}
                     </div>
                 </div>

@@ -4,16 +4,20 @@ import { useState } from 'react'
 import Vars from './Vars';
 import { useEffect } from 'react';
 import { useRef } from 'react';
+import AddNewVar from './AddNewVar';
 
 function ContactMessage({ section, onSaveClick, onCancelClick }) {
     const [emailContact, setEmailContact] = useState(section.targetEmail);
     const [mobileContact, setMobileContact] = useState(section.targetPhon);
-    const [newKey, setNewKey] = useState("");
-    const [newValue, setNewValue] = useState("");
-    const [varsContact, setVarsContact] = useState([]);
+    const [volumeParticipant, setVolumeParticipant] = useState(section.volumeVideoTrack);
 
-    const newKeyRef = useRef(null)
-    const newValueRef = useRef(null)
+    const [varsContact, setVarsContact] = useState([]);
+    const [addNewVarMode, setAddNewVarMode] = useState(false)
+
+    const emailContactRef = useRef(null);
+    const mobileContactRef = useRef(null);
+    const volumeParticipantRef = useRef(null);
+
 
     useEffect(() => {
         if (section.vars.length > 0) {
@@ -21,17 +25,16 @@ function ContactMessage({ section, onSaveClick, onCancelClick }) {
         }
     }, [section.vars])
 
-    const onAddVarClick = () => {
-        newKeyRef.current.setCustomValidity('');
-        if(varsContact.some(variable => variable.key === newKey)){
-            newKeyRef.current.setCustomValidity('key must to be unique');
-        }
-
-        if (newKeyRef.current.reportValidity() && newValueRef.current.reportValidity()) {
-            const newVarsArr = [...varsContact, { key: newKey, value: newValue }];
-            setVarsContact(newVarsArr);
-            setNewKey("");
-            setNewValue("");
+    const onSaveParticipantOptions = () => {
+        if (
+            emailContactRef.current.reportValidity()
+            &&
+            mobileContactRef.current.reportValidity()
+            &&
+            volumeParticipantRef.current.reportValidity()
+        ) {
+            onCancelClick();
+            onSaveClick(varsContact);
         }
     }
 
@@ -51,45 +54,53 @@ function ContactMessage({ section, onSaveClick, onCancelClick }) {
 
     return (
         <div className="contact-message-main-container">
+            <h3 className='title vars-contact-title center-text' style={{ marginTop: 240 }}>Contact options</h3>
             <div className='contact-message-container' >
+                <div className='volume-contact-input-container contact-input-container'>
+                    <label className='contact-label volume-label'
+                        htmlFor="volume-contact" >
+                        volume: {volumeParticipant}
+                    </label>
+                    <input className='input-contact' type="range" name="volume-contact" id="volume-contact"
+                        ref={volumeParticipantRef}
+                        value={volumeParticipant}
+                        onChange={(e) => setVolumeParticipant(e.target.value)} />
+                </div>
                 <div className='email-contact-input-container contact-input-container'>
-                    <label className='contact-label email-label' htmlFor="email-contact" />
+                    <label className='contact-label contact-label-icon email-label' htmlFor="email-contact" />
                     <input className='input-contact' type="email" name="email-contact" id="email-contact"
+                        ref={emailContactRef}
                         value={emailContact}
                         onChange={(e) => setEmailContact(e.target.value)} />
                 </div>
                 <div className='mobile-contact-input-container contact-input-container'>
-                    <label className='contact-label mobile-label' htmlFor="mobile-contact" />
+                    <label className='contact-label contact-label-icon mobile-label' htmlFor="mobile-contact" />
                     <input className='input-contact' type="phone" name="mobile-contact" id="mobile-contact"
+                        ref={mobileContactRef}
                         value={mobileContact}
                         onChange={(e) => setMobileContact(e.target.value)} />
                 </div>
+                <h4 style={{ borderTop: "1px solid black" }} className='title vars-contact-title center-text'>Variables</h4>
                 {varsContact.map(variable => <Vars
                     key={section.id + variable.key}
                     varKey={variable.key}
                     varValue={variable.value}
                     onVarChange={onVarChange}
-                    onVarDelete={onVarDelete} />
+                    onVarDelete={onVarDelete}
+                />
                 )}
 
             </div>
-            <div className='new-var-contact-input-container'>
-                <div className='new-key-contact-input-container contact-input-container'>
-                    <label className='contact-label new-key-label' htmlFor="new-key-contact" >KEY</label>
-                    <input ref={newKeyRef} required className='input-contact' type="text" name="new-key-contact" id="new-key-contact"
-                        value={newKey}
-                        onChange={(e) => setNewKey(e.target.value)} />
-                </div>
-                <div className='new-value-contact-input-container contact-input-container'>
-                    <label className='contact-label new-value-label' htmlFor="new-value-contact" >VALUE</label>
-                    <input ref={newValueRef} required className='input-contact' type="text" name="new-value-contact" id="new-value-contact"
-                        value={newValue}
-                        onChange={(e) => setNewValue(e.target.value)} />
-                </div>
-                <button onClick={onAddVarClick} >add variable</button>
+            <button onClick={() => setAddNewVarMode(pre => !pre)} >{addNewVarMode ? "X" : "+ Add a new variable"}</button>
+            {
+                addNewVarMode
+                &&
+                <AddNewVar varsContact={varsContact} setVarsContact={setVarsContact} />
+            }
+            <div style={{ borderTop: "1px solid black" }} className="save-cancel-container">
+                <button onClick={onSaveParticipantOptions} >save</button>
+                <button onClick={() => onCancelClick()} >cancel</button>
             </div>
-            <button onClick={() => {onCancelClick(); onSaveClick(varsContact)}} >save</button>
-            <button onClick={() => onCancelClick()} >cancel</button>
         </div>
     )
 }
