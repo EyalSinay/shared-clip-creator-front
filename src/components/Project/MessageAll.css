@@ -1,0 +1,51 @@
+.message-all-container {
+  padding: 20px;
+  width: 100%;
+  margin-top: 100px;
+}
+
+.variables-container {
+  margin-bottom: 16px;
+}
+
+.message-all-keyVar-btn {
+  padding: 8px;
+  margin-right: 8px;
+  background-color: black;
+  color: #ffff;
+  border-radius: 8px;
+}
+
+#message-input {
+  width: 100%;
+  margin-bottom: 30px;
+  min-height: 200px;
+  border-radius: 20px;
+  padding: 28px;
+  font-size: 20px;
+}
+
+.send-message-all-btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.send-all-btn {
+  width: 40px;
+  height: 40px;
+  padding: 16px;
+  margin: 2px 8px 40px 8px;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.send-mail-all-btn {
+  background-image: url('../../assets/buttons-icons/icons8-mail-48\ 1.png');
+}
+.send-whatsapp-all-btn {
+  background-image: url('../../assets/buttons-icons/icons8-whatsapp-48\ 1.png');
+}

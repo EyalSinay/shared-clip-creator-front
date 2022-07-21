@@ -36,7 +36,6 @@ function SectionsEditMode({
             secure: secure,
             vars: varsContact
         }
-        console.log("hi ani secure", secure);
         onSaveParticipantDetailsClick(newObj, section.id);
         // setContactDetailsOpen(false);
     }

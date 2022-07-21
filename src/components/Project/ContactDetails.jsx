@@ -101,6 +101,7 @@ function ContactMessage({ section, onSaveClick, onCancelClick }) {
                         value={emailContact}
                         onChange={(e) => setEmailContact(e.target.value)} />
                 </div>
+                <span style={{color: "red", fontSize: 20}} >Note that if you change the email address, the link will change, and if the participant has already uploaded a file, the file will be deleted.</span>
                 <div className='mobile-contact-input-container contact-input-container'>
                     <label className='contact-label contact-label-icon mobile-label' htmlFor="mobile-contact" />
                     <input className='input-contact' type="phone" name="mobile-contact" id="mobile-contact"

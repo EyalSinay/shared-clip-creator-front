@@ -1,7 +1,7 @@
 import './Project.css';
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import { UserContext } from '../../providers/UserProvider.jsx';
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Wavesurfer from "wavesurfer.js";
 import * as WaveformMarkersPlugin from "wavesurfer.js/dist/plugin/wavesurfer.markers";
 import * as WaveformTimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline";
@@ -19,6 +19,7 @@ import AutoDivideScreen from './AutoDivideScreen';
 import { BASE_URL } from '../../utils/globalConst.js';
 import NavBar from '../global-components/NavBar';
 import ProjectOptions from './ProjectOptions';
+import MessageAll from './MessageAll';
 
 function Project() {
   const navigate = useNavigate();
@@ -48,14 +49,11 @@ function Project() {
   const [project, setProject] = useState({});
   const paramsPath = useParams();
   const { token, projects, setProjects } = useContext(UserContext);
-  const location = useLocation();
 
   // projectData:
   useEffect(() => {
     if (Object.keys(project).length === 0) {
-      if (location?.state?.projectData) {
-        setProject(location.state.projectData);
-      } else if (Object.keys(projects).length === 0 && projects.length > 0) {
+      if (Object.keys(projects).length === 0 && projects.length > 0) {
         const projectId = paramsPath.id;
         const theProject = projects.find(project => project._id === projectId);
         if (theProject) {
@@ -83,10 +81,9 @@ function Project() {
       }
     }
     // eslint-disable-next-line
-  }, [project, token, paramsPath.id, location]);
+  }, [project, token, paramsPath.id]);
 
   // audio:
-  // ! use location.state.audioTrack if exist
   useEffect(() => {
     if (waveform.current && waveformTimeline.current && !wavesurferObj) {
       setWavesurferObj(
@@ -391,7 +388,6 @@ function Project() {
     const projectId = paramsPath.id;
     const theToken = token || localStorage.getItem("TOKEN");
     const data = await updateSections(theToken, projectId, sections);
-    console.log(data);
     const newProjectObj = JSON.parse(JSON.stringify(project));
     newProjectObj.sections = data;
     setProject(newProjectObj);
@@ -484,6 +480,8 @@ function Project() {
       context: 'CLIP'
     }
   ];
+
+
 
   return (
     <>
@@ -591,29 +589,52 @@ function Project() {
           {
             editProjectMode
             &&
-            <div className="section-input-container">
-              <div className='new-label-name-container'>
-                <label htmlFor="new-label-name">participant: </label>
-                <input type="text" name="new-label-name" id="new-label-name" value={newMarkerName} ref={nameInput} required onChange={e => onInputChange(e.target.value, setNewMarkerName)} onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
+            <>
+              <div className="section-input-container">
+                <div className='new-label-name-container'>
+                  <label htmlFor="new-label-name">participant: </label>
+                  <input type="text" name="new-label-name" id="new-label-name" value={newMarkerName} ref={nameInput} required onChange={e => onInputChange(e.target.value, setNewMarkerName)} onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
+                </div>
+                <div className='new-label-sec-container'>
+                  <label htmlFor="new-label-sec">second-start: </label>
+                  <input type="number" name="new-label-sec" id="new-label-sec"
+                    ref={secondInput} min={0} max={duration - 3} step={0.1} required
+                    value={newMarkerSecond}
+                    onChange={e => onInputChange(parseFloat(e.target.value), setNewMarkerSecond)}
+                    onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
+                  <button onClick={onDecrementClick} >-</button>
+                  <button onClick={onIncrementClick} >+</button>
+                </div>
+                <button onClick={createNewMarker}>create</button>
               </div>
-              <div className='new-label-sec-container'>
-                <label htmlFor="new-label-sec">second-start: </label>
-                <input type="number" name="new-label-sec" id="new-label-sec"
-                  ref={secondInput} min={0} max={duration - 3} step={0.1} required
-                  value={newMarkerSecond}
-                  onChange={e => onInputChange(parseFloat(e.target.value), setNewMarkerSecond)}
-                  onKeyPress={(e) => { if (e.key === "Enter") createNewMarker() }} />
-                <button onClick={onDecrementClick} >-</button>
-                <button onClick={onIncrementClick} >+</button>
+              <div className="save-cancel-btn-container">
+                <button
+                  className={"project-btn save-btn"}
+                  onClick={onEditSaveClick} >
+                  Save
+                </button>
+                {
+                  Object.keys(project).length !== 0
+                  &&
+                  project.sections.length > 0
+                  &&
+                  <button
+                    className='project-btn cancel-edit-mode-btn'
+                    onClick={cancelEditMode} >
+                    Cancel
+                  </button>
+                }
               </div>
-              <button onClick={createNewMarker}>create</button>
-            </div>
+            </>
           }
         </section>
-        <section className="message-container">
-          <input type="textarea" id='message-input' />
-          {/* create a projectMessage state and update the project in db with PATCH(!) request */}
-        </section>
+        {!editProjectMode
+          &&
+          <MessageAll
+            token={token || localStorage.getItem("TOKEN")}
+            project={project}
+            setProject={setProject}
+          />}
       </div>
     </>
   )

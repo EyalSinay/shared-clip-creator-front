@@ -22,7 +22,7 @@ h2{
     opacity: 0.5;
 }
 
-input{
+input, textarea{
     background-color: black;
     color: #ffff;
     border-radius: 8px;

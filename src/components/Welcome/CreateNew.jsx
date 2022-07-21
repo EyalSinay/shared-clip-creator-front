@@ -16,7 +16,6 @@ function CreateNew() {
     const [createMode, setCreateMode] = useState(false);
     const [step1, setStep1] = useState(false);
     const [step2, setStep2] = useState(false);
-    const [projectData, setProjectData] = useState({})
     const [projectName, setProjectName] = useState("");
     const [projectId, setProjectId] = useState("");
     const [audioTrack, setAudioTrack] = useState(null);
@@ -61,7 +60,6 @@ function CreateNew() {
                         setStep1(false);
                         setStep2(true);
                     }
-                    setProjectData(data);
                     setProjectId(data._id);
                 } catch (err) {
                     console.error(err);
@@ -96,7 +94,7 @@ function CreateNew() {
                 }
             }
             setLoading(false);
-            navigate('/project/' + projectId, { state: { projectData, audioTrack } });
+            navigate('/project/' + projectId);
         }
     }
 

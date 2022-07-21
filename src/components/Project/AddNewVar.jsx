@@ -11,6 +11,12 @@ function AddNewVar({varsContact, setVarsContact, setAddNewVarMode}) {
         if (varsContact.some(variable => variable.key === newKey)) {
             newKeyRef.current.setCustomValidity('key must to be unique');
         }
+        if(newKey === "NAME"){
+            newKeyRef.current.setCustomValidity('NAME is a key that in use by default');
+        }
+        if(newKey === "LINK"){
+            newKeyRef.current.setCustomValidity('LINK is a key that in use by default');
+        }
 
         if (newKeyRef.current.reportValidity() && newValueRef.current.reportValidity()) {
             const newVarsArr = [...varsContact, { key: newKey, value: newValue }];
@@ -27,7 +33,7 @@ function AddNewVar({varsContact, setVarsContact, setAddNewVarMode}) {
                 <label className='contact-label new-key-label' htmlFor="new-key-contact" >KEY</label>
                 <input ref={newKeyRef} required className='input-contact' type="text" name="new-key-contact" id="new-key-contact"
                     value={newKey}
-                    onChange={(e) => setNewKey(e.target.value)} />
+                    onChange={(e) => setNewKey(e.target.value.toUpperCase())} />
             </div>
             <div className='new-value-contact-input-container contact-input-container'>
                 <label className='contact-label new-value-label' htmlFor="new-value-contact" >VALUE</label>
