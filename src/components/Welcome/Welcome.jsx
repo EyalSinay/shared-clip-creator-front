@@ -1,5 +1,8 @@
-import './Welcome.css'
-import logoImg from '../../assets/logo.png'
+import uploadIcon from '../../assets/buttons-icons/welcome-page-icons/icons8-upload-64.png'
+import divideIcon from '../../assets/buttons-icons/welcome-page-icons/icons8-cut-64.png'
+import sendIcon from '../../assets/buttons-icons/welcome-page-icons/icons8-send-49.png'
+import './Welcome.css';
+import logoImg from '../../assets/logo.png';
 import React, { useContext } from 'react';
 import { UserContext } from '../../providers/UserProvider'
 import UserConnect from './UserConnect';
@@ -18,10 +21,10 @@ function Welcome() {
               <img className='logo' src={logoImg} alt="logo" />
               <h2>Shared Clip Creator</h2>
               <h3>Create a collaboration clip in 3 steps</h3>
-              <ol>
-                <a href="#welcome-sec2"><li>Upload an audio file</li></a>
-                <a href="#welcome-sec3"><li>Divide into sections for your participants</li></a>
-                <a href="#welcome-sec4"><li>Send everyone links to their sections</li></a>
+              <ol className='welcome-actions-list'>
+                <a href="#welcome-sec2" className='hover-opacity'><li>Upload</li><img src={uploadIcon} alt="i" /></a>
+                <a href="#welcome-sec3" className='hover-opacity'><li>Divide</li><img src={divideIcon} alt="i" /></a>
+                <a href="#welcome-sec4" className='hover-opacity'><li>Send</li><img src={sendIcon} alt="i" /></a>
               </ol>
               <section>Your participants will receive a simple page where they will be asked to record themselves in a video on top of the sound clip you sent them, or upload a video or photo.</section>
               <section>Once everyone is done you can get the clip edited and ready!</section>

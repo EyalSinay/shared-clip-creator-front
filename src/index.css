@@ -1,3 +1,35 @@
+:root {
+  /* ---bright-colors--- */
+
+  /* borders and shadows */
+  --b-color-1: #d4d4eb;
+
+  /* hovers */
+  --b-color-2: #ebd4e0;
+
+  /* backgrounds */
+  --b-color-3: #ebebd4;
+
+  /* buttons */
+  --b-color-4: #d4ebdf;
+
+
+  /* ---darks-colors--- */
+
+  /* borders and shadows */
+  --d-color-1: #0006e2;
+
+  /* hovers */
+  --d-color-2: #e20077;
+
+  /* backgrounds */
+  --d-color-3: #e2dc00;
+
+  /* buttons */
+  --d-color-4: #00e26b;
+}
+
+
 @import url('https://fonts.googleapis.com/css2?family=Cabin:ital,wght@1,500&family=Grechen+Fuemen&family=Josefin+Sans&display=swap');
 
 ::-webkit-scrollbar {
@@ -5,20 +37,20 @@
 }
 
 ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px grey; 
+  box-shadow: inset 0 0 5px var(--d-color-1);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(0, 174, 255); 
+  background: var(--d-color-1);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(0, 255, 255); 
+  background: var(--d-color-3);
 }
 
-*{
+* {
   box-sizing: border-box;
 }
 
