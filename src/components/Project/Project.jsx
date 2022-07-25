@@ -9,7 +9,7 @@ import * as WaveformCursorPlugin from "wavesurfer.js/dist/plugin/wavesurfer.curs
 import getProjectById from '../../utils/getProjectById.js';
 import updateSections from '../../utils/updateSections.js';
 import deleteProject from '../../utils/deleteProject.js';
-import updateProject from '../../utils/updateProject.js'
+import updateProject from '../../utils/updateProject.js';
 import randomColor from "randomcolor";
 import { Beforeunload } from 'react-beforeunload';
 import SpinnerAllPageOnComponent from '../global-components/SpinnerAllPageOnComponent';
@@ -136,9 +136,10 @@ function Project() {
     }
   }, [wavesurferObj]);
 
-  const getNewMarkersArrFromProject = () => {
+  const getNewMarkersArrFromSecOrProject = (_sections) => {
+    const sections = _sections ? _sections : project.sections;
     const newArr = [];
-    project.sections.forEach(sec => {
+    sections.forEach(sec => {
       newArr.push({
         name: sec.secName,
         projectName: sec.projectName,
@@ -178,7 +179,7 @@ function Project() {
   useEffect(() => {
     if (duration && Object.keys(project).length !== 0 && markers.length === 0) {
       if (project.sections.length > 0) {
-        const newArr = getNewMarkersArrFromProject();
+        const newArr = getNewMarkersArrFromSecOrProject();
         updateMarkersOnWaveSurfer(newArr);
         if (editProjectMode) setEditProjectMode(false);
         // ! if(markers.some(mark => !mark.seenByOwner)) update database to be true by post request
@@ -381,9 +382,9 @@ function Project() {
     }
   }
 
-  const updateSectionsInDb = async (sections) => {
+  const updateSectionsInDb = async (_sections) => {
     // ! spinner on
-    sections = sections ? sections : markers;
+    const sections = _sections ? _sections : markers;
 
     const projectId = paramsPath.id;
     const theToken = token || localStorage.getItem("TOKEN");
@@ -391,12 +392,14 @@ function Project() {
     const newProjectObj = JSON.parse(JSON.stringify(project));
     newProjectObj.sections = data;
     setProject(newProjectObj);
+    const newMarksArr = getNewMarkersArrFromSecOrProject(data);
+    updateMarkersOnWaveSurfer(newMarksArr);
     // ! spinner off
   }
 
   const cancelEditMode = () => {
     setEditProjectMode(false);
-    const newArr = getNewMarkersArrFromProject();
+    const newArr = getNewMarkersArrFromSecOrProject();
     updateMarkersOnWaveSurfer(newArr);
   }
 

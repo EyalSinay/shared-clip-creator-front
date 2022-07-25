@@ -113,7 +113,7 @@ function Section() {
     }
   }
 
-  if (loading) return <div>Loading...</div>
+  if (loading || Object.keys(section).length === 0) return <div>Loading...</div>
 
   return (
     <>
@@ -126,7 +126,7 @@ function Section() {
       <div className='section-page-container' >
         <h1 className='center-text' >{section.projectName}</h1>
         <h2 className='center-text' >{section.secName}</h2>
-        <p>{section.message}</p>
+        <p>{section.message.message}</p>
         <p>secondStart: {section.secondStart}</p>
         <p>secondEnd: {section.secondEnd}</p>
         <p>duration: {sectionDuration}</p>

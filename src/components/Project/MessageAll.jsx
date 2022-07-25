@@ -5,13 +5,14 @@ import { useEffect } from 'react';
 import updateProject from '../../utils/updateProject';
 import { useRef } from 'react';
 import MessageScreen from '../global-components/MessageScreen';
-import SendMessageAllScreen from './SendMessageAllScreen'
+import SendMessageAllScreen from './SendMessageAllScreen';
 
 function MessageAll({ project, token, setProject }) {
     const [message, setMessage] = useState("");
     const [keysArr, setKeysArr] = useState(["NAME", "LINK"]);
     const [paragraphsArr, setParagraphsArr] = useState([])
-    const [firstUserType, setFirstUserType] = useState(false);
+    const [userType, setUserType] = useState(0);
+    const [axiosReq, setAxiosReq] = useState(0);
     const messageRef = useRef(null);
     const [emailScreenOn, setEmailScreenOn] = useState(false);
     const [whatsAppScreenOn, setWhatsAppScreenOn] = useState(false);
@@ -24,21 +25,24 @@ function MessageAll({ project, token, setProject }) {
 
     useEffect(() => {
         if (project.message !== undefined && project.message !== message) {
-            setMessage(project.message);
+            setMessage(project.message.message);
         }
         // eslint-disable-next-line
     }, [project.message])
 
     useEffect(() => {
-        if (firstUserType) {
+        if (userType > axiosReq) {
             const delay = setTimeout(() => {
-                updateProject(token, project._id, { message })
-                    .then(data => { setProject(data) });
+                updateProject(token, project._id, { message: { message, paragraphsArr } })
+                    .then(data => {
+                        setProject(data);
+                        setAxiosReq(userType);
+                    });
             }, 3000);
             return () => clearTimeout(delay);
         }
         // eslint-disable-next-line
-    }, [message]);
+    }, [paragraphsArr]);
 
     useEffect(() => {
         if (messageRef) {
@@ -47,17 +51,16 @@ function MessageAll({ project, token, setProject }) {
     }, [message]);
 
     const onMessageChange = (e) => {
-        setFirstUserType(true);
+        setUserType(userType + 1);
         setMessage(e.target.value)
     }
 
     const onVarClick = (e) => {
+        //! insert in the current cursor position
         const newStr = message + "▷" + e.target.value + "◁";
         setMessage(newStr);
         messageRef.current.focus();
     }
-
-
 
     return (
         <section className="message-all-container">
@@ -89,7 +92,7 @@ function MessageAll({ project, token, setProject }) {
                 <button onClick={() => setEmailScreenOn(true)} className='send-mail-all-btn send-all-btn' />
                 <button onClick={() => setWhatsAppScreenOn(true)} className='send-whatsapp-all-btn send-all-btn' />
                 <MessageScreen screenShow={emailScreenOn} turnOff={() => setEmailScreenOn(false)} >
-                    <SendMessageAllScreen project={project} paragraphsArr={paragraphsArr} onCancelClick={() => setEmailScreenOn(false)} />
+                    <SendMessageAllScreen project={project} paragraphsArr={paragraphsArr} token={token} onCancelClick={() => setEmailScreenOn(false)} />
                 </MessageScreen>
                 <MessageScreen screenShow={whatsAppScreenOn} turnOff={() => setWhatsAppScreenOn(false)} >
                     <h1>This option will be available soon</h1>

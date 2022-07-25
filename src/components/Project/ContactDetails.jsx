@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { useRef } from 'react';
 import AddNewVar from './AddNewVar';
 
-function ContactMessage({ section, onSaveClick, onCancelClick }) {
+function ContactDetails({ section, onSaveClick, onCancelClick }) {
     const [emailContact, setEmailContact] = useState(section.targetEmail);
     const [mobileContact, setMobileContact] = useState(section.targetPhon);
     const [volumeParticipant, setVolumeParticipant] = useState(section.volumeVideoTrack);
@@ -39,15 +39,15 @@ function ContactMessage({ section, onSaveClick, onCancelClick }) {
 
     const onSaveParticipantOptions = () => {
         mobileContactRef.current.setCustomValidity('');
-        if(!validatePhoneNumber(mobileContact) && mobileContact !== ""){
+        if (!validatePhoneNumber(mobileContact) && mobileContact !== "") {
             mobileContactRef.current.setCustomValidity('Please enter a valid phone number');
         }
 
         emailContactRef.current.setCustomValidity('');
-        if(!validateEmail(emailContact) && emailContact !== ""){
+        if (!validateEmail(emailContact) && emailContact !== "") {
             mobileContactRef.current.setCustomValidity('Please enter a valid email address');
         }
-        
+
         if (
             emailContactRef.current.reportValidity()
             &&
@@ -101,7 +101,7 @@ function ContactMessage({ section, onSaveClick, onCancelClick }) {
                         value={emailContact}
                         onChange={(e) => setEmailContact(e.target.value)} />
                 </div>
-                <span style={{color: "red", fontSize: 20}} >Note that if you change the email address, the link will change, and if the participant has already uploaded a file, the file will be deleted.</span>
+                {section.targetEmail !== "" && <span style={{ color: "red", fontSize: 20 }} >Note that if you change the email address, the link will change, and if the participant has already uploaded a file, the file will be deleted.</span>}
                 <div className='mobile-contact-input-container contact-input-container'>
                     <label className='contact-label contact-label-icon mobile-label' htmlFor="mobile-contact" />
                     <input className='input-contact' type="phone" name="mobile-contact" id="mobile-contact"
@@ -142,4 +142,4 @@ function ContactMessage({ section, onSaveClick, onCancelClick }) {
     )
 }
 
-export default ContactMessage
+export default ContactDetails;

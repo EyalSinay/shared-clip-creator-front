@@ -15,7 +15,7 @@ const updateSections = async (token, projectId, sectionsArr) => {
             secondEnd: sec.secondEnd,
             seenByOwner: sec.seenByOwner,
             volumeVideoTrack: sec.volumeVideoTrack,
-            vars: sec.vars,
+            vars: sec.vars
         });
     });
   

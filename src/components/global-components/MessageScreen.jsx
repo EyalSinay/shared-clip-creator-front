@@ -18,7 +18,7 @@ function MessageScreen({ children, screenShow = false, turnOff = () => { } }) {
                     onClick={onTurnOffClick}
                 >
                     <div className="message-context"
-                        onKeyDown={e => { if (e.key === 'Escape') onTurnOffClick() }} //!? not working
+                        onKeyDown={e => { if (e.key === 'Escape') onTurnOffClick(e) }}
                         tabIndex="0"
                     >
                         {children}

@@ -1,17 +1,20 @@
 import React from 'react'
+import sendMailAll from '../../utils/sendMailAll';
 
-function SendMessageAllScreen({ project, paragraphsArr, onCancelClick }) {
+function SendMessageAllScreen({ project, paragraphsArr, token, onCancelClick }) {
 
-    const onSendClick = (e) => {
+    const onSendClick = async (e) => {
         e.preventDefault();
-        const idsChecked =[];
+        const idsChecked = [];
         const inputsCollection = e.target.elements;
         for (let input of inputsCollection) {
-            if(input.checked){
+            if (input.checked) {
                 idsChecked.push(input.value);
             }
-          }
-          console.log(idsChecked);
+        }
+
+        await sendMailAll(token, project._id, idsChecked);
+        onCancelClick();
     }
 
     return (
